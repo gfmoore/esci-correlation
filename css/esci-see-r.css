@@ -1,0 +1,114 @@
+/*
+Program       esci-d-picture.css
+Author        Gordon Moore
+Date          20 August 2020
+Description   CSS for esci see-r
+Licence       GNU General Public LIcence Version 3, 29 June 2007
+*/
+
+/* #region Version history
+
+0.0.1   Initial version
+
+
+#endregion */
+
+
+/*------------------------------override on ion slider-----------------------------------*/
+/*blank out end labels*/
+.irs--big .irs-min {
+  color: rgba(0, 0, 0, 0.0);
+  background-color: rgba(0, 0, 0, 0.0);
+}
+
+.irs--big .irs-max {
+  color: rgba(0, 0, 0, 0.0);
+  background-color: rgba(0, 0, 0, 0.0);
+}
+
+.irs-grid-text {
+  font-size: 1.4rem;
+}
+
+/*---------------------------------icons-----------------------------------------------------------*/
+
+.icons {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+/*----------------------------------Override left panel--------------------------------------------*/
+
+#leftpanel {
+  border: 2px solid black;
+  font-size: 1.6rem;
+}
+
+#header {
+  border: 0px solid black;
+}
+
+#breadcrumbs {
+  border: 1px solid black;
+  font-size: 1.6rem;
+}
+
+/*----------------------------------Panels-----------------------------------------------------*/
+
+.red {
+  color: red;
+}
+
+.black {
+  color: black;
+}
+
+
+.slidericons {
+  margin-top: 2.8rem;
+}
+
+.slidericons:hover {
+  background-color: lightgray;
+}
+
+.slidericons:active {
+  background-color: darkgrey;
+}
+
+/*---------------------------------Left Panel-------------------------------------------*/
+
+
+
+
+/*----------------------------------Right panel-----------------------------------------*/
+#rightpanel {
+  border: 1px solid grey;
+  display: grid;
+  grid-template-rows: 5fr 1fr;
+}
+
+
+/*----------------------------------display-------------------------------------------------------------*/
+
+#display {
+  background-color: white;
+}
+
+
+/*----------------------------------xxx slider--------------------------------------------------------------*/
+
+#xxxtitle {
+  font-size: 1.7rem;
+  padding-left: 0rem;
+  padding-top: 2.8rem;
+}
+
+#sliderdisplayarea {
+  position: relative;
+  height:6.0rem;
+}
+
+.icons {
+  margin-top: 2.6rem;
+}
