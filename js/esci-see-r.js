@@ -43,7 +43,7 @@ $(function() {
 
   //panel 1 N
   let $Nslider;
-  let N = 10;
+  let N = 4;
   const $Nval = $('#Nval');
   $Nval.val(N.toFixed(0));
   const $Nnudgebackward = $('#Nnudgebackward');
@@ -145,12 +145,12 @@ $(function() {
     $('#Nslider').ionRangeSlider({
       skin: 'big',
       grid: true,
-      grid_num: 5,
+      grid_num: 6,
       type: 'single',
       min: 0,
-      max: 100,
-      from: 10,
-      step: 10,
+      max: 300,
+      from: 4,
+      step: 1,
       prettify: prettify0,
       //on slider handles change
       onChange: function (data) {
@@ -243,7 +243,7 @@ $(function() {
   //set everything to a default state.
   function clear() {
     //set sliders to initial
-    N = 10;
+    N = 4;
     updateN();
     $Nval.text(N.toFixed(0));
 
@@ -283,7 +283,7 @@ $(function() {
 
   })
 
-  
+
 /*----------------------------------------N nudge bars-----------*/
   //changes to N
   $Nval.on('change', function() {
@@ -292,11 +292,11 @@ $(function() {
       return;
     };
     N = parseFloat($Nval.val()).toFixed(0);
-    if (N < 1) {
-      N = 1;
+    if (N < 4) {
+      N = 4;
     }
-    if (N > 100) {
-      N = 100;
+    if (N > 300) {
+      N = 300;
     }
     $Nval.val(N.toFixed(0));
     updateN();
@@ -318,7 +318,7 @@ $(function() {
 
   function Nnudgebackward() {
     N -= 1;
-    if (N < 1) N = 1;
+    if (N < 4) N = 4;
     $Nval.val(N.toFixed(0));
     updateN();
   }
@@ -339,7 +339,7 @@ $(function() {
 
   function Nnudgeforward() {
     N += 1;
-    if (N > 100) N = 100;
+    if (N > 300) N = 300;
     $Nval.val(N.toFixed(0));
     updateN();
   }
