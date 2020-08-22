@@ -44,30 +44,42 @@ $(function() {
   //panel 1 N
   let $Nslider;
   let N = 10;
-  $Nval = $('#Nval');
+  const $Nval = $('#Nval');
   $Nval.val(N.toFixed(0));
-  $Nnudgebackward = $('#Nnudgebackward');
-  $Nnudgeforward = $('#Nnudgeforward');
+  const $Nnudgebackward = $('#Nnudgebackward');
+  const $Nnudgeforward = $('#Nnudgeforward');
 
   //panel 2 r
   let $rslider;
   let r = 0.5;
-  $rval = $('#rval');
+  const $rval = $('#rval');
   $rval.val(r.toFixed(1));
-  $rnudgebackward = $('#rnudgebackward');
-  $rnudgeforward = $('#rnudgeforward');
+  const $rnudgebackward = $('#rnudgebackward');
+  const $rnudgeforward = $('#rnudgeforward');
 
   //panel 3 rho
   let $rhoslider;
   let rho = 0.5;
-  $rhoval = $('#rhoval');
+  const $rhoval = $('#rhoval');
   $rhoval.val(rho.toFixed(1));
-  $rhonudgebackward = $('#rhonudgebackward');
-  $rhonudgeforward = $('#rhonudgeforward');
+  const $rhonudgebackward = $('#rhonudgebackward');
+  const $rhonudgeforward = $('#rhonudgeforward');
 
   //panel 4 New data set
-  $newdataset = $('#newdataset');
+  const $newdataset = $('#newdataset');
   
+  //panel 5 Display features
+  const $displayr = $('#displayr');
+  let displayr;
+
+  const $displayctm = $('#displayctm');
+  let displayctm;
+
+  const $displaymd = $('#displaymd');
+  let displaymd;
+
+
+
   let svgD;   
                                                                               //the svg reference to pdfdisplay
   const $display            = $('#display');
@@ -248,13 +260,30 @@ $(function() {
 
   }
 
-  /*--------------------------------------New Data Set----------*/
+  /*--------------------------------------New Data Set----------------*/ 
 
-  $newdataset.on('change', function() {
-    
+  $newdataset.on('change', function() {  //button
+
   })
 
+  /*--------------------------------------Display Features-------------*/
 
+  $displayr.on('change', function() {
+    displayr = $displayr.is(':checked');
+
+  })
+
+  $displayctm.on('change', function() {
+    displayctm = $displayctm.is(':checked');
+
+  })
+
+  $displaymd.on('change', function() {
+    displaymd = $displaymd.is(':checked');
+
+  })
+
+  
 /*----------------------------------------N nudge bars-----------*/
   //changes to N
   $Nval.on('change', function() {
@@ -434,9 +463,6 @@ $(function() {
     $rhoval.val(rho.toFixed(1));
     updaterho();
   }
-
-
-
 
 
   /*---------------------------------------------Tooltips on or off-------------------------------------- */
