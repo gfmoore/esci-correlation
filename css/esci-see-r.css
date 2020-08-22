@@ -14,27 +14,51 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 #endregion */
 
 
-/*------------------------------override on ion slider-----------------------------------*/
-/*blank out end labels*/
-.irs--big .irs-min {
-  color: rgba(0, 0, 0, 0.0);
-  background-color: rgba(0, 0, 0, 0.0);
+/*---------------------------------icons-----------------------------------------------------------*/
+
+.red {
+  color: red;
 }
 
-.irs--big .irs-max {
-  color: rgba(0, 0, 0, 0.0);
-  background-color: rgba(0, 0, 0, 0.0);
+.black {
+  color: black;
 }
 
-.irs-grid-text {
+.small {
+  font-size: 1.3rem;
+}
+
+.small1 {
   font-size: 1.4rem;
 }
 
-/*---------------------------------icons-----------------------------------------------------------*/
+.backcolour {
+  border: 1px solid darkgrey;
+  background-color: lemonchiffon;
+  padding-left:0.2rem;
+  padding-right: 0.2rem;
+}
+
+.greek2 {
+  font-size: 2.2rem;
+}
 
 .icons {
   width: 2.5rem;
   height: 2.5rem;
+  margin-top: 2.6rem;
+}
+
+.slidericons {
+  margin-top: 2.8rem;
+}
+
+.slidericons:hover {
+  background-color: lightgray;
+}
+
+.slidericons:active {
+  background-color: darkgrey;
 }
 
 /*----------------------------------Override left panel--------------------------------------------*/
@@ -55,30 +79,129 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 
 /*----------------------------------Panels-----------------------------------------------------*/
 
-.red {
-  color: red;
+/*--------------Panel 1 N-----------------------*/
+#Npanel {
+  border: 1px solid black;
+  background-color: #FFFF99;
+  padding: 0.5rem;
 }
 
-.black {
-  color: black;
+#Nsliderpanel {
+  display: grid;
+  grid-template-columns: 25rem 2rem 3rem 5rem;
+  grid-row-gap: 3rem;
+  margin-top: 1rem;
+}
+
+#Nval {
+  margin-top: 2.5rem;
+  height: 2rem;
+  width: 4rem;
+}
+
+/*--------------Panel 2 r-----------------------*/
+#rpanel {
+  border: 1px solid black;
+  background-color: #CCFFCC;
+  padding: 0.5rem;
+}
+
+#rsliderpanel {
+  display: grid;
+  grid-template-columns: 25rem 2rem 3rem 5rem;
+  grid-row-gap: 3rem;
+  margin-top: 1rem;
+}
+
+#rval {
+  margin-top: 2.5rem;
+  height: 2rem;
+  width: 4rem;
+}
+
+#calculatedrdiv {
+  margin: 0.5rem;
+}
+
+/*--------------Panel 3 rho-----------------------*/
+#rhopanel {
+  border: 1px solid black;
+  background-color: #FFCC99;
+  padding: 0.5rem;
+}
+
+#rhosliderpanel {
+  display: grid;
+  grid-template-columns: 25rem 2rem 3rem 5rem;
+  grid-row-gap: 3rem;
+  margin-top: 1rem;
+}
+
+#rhoval {
+  margin-top: 2.5rem;
+  height: 2rem;
+  width: 4rem;
+}
+
+#calculatedrhodiv {
+  margin: 0.5rem;
+}
+
+#cionrhodiv {
+  margin: 0.5rem;
+}
+
+#cionrhoinfo {
+  margin: 0.5rem;
 }
 
 
-.slidericons {
-  margin-top: 2.8rem;
+/*--------------Panel 4 New data set-----------------------*/
+#newdatasetpanel {
+  border: 1px solid black;
+  background-color: ivory;
+  padding: 0.5rem;
 }
 
-.slidericons:hover {
-  background-color: lightgray;
+#newdataset {
+  padding: 0.7rem;
+  width: 12rem;
+  height: 2.3rem;
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: palegreen;
+  margin-top: -1rem;
+  margin-bottom: 0.5rem;
+  margin-left: 5rem;
 }
 
-.slidericons:active {
-  background-color: darkgrey;
+#newdataset:hover {
+  background-color: springgreen;
 }
 
-/*---------------------------------Left Panel-------------------------------------------*/
+#newdataset:active {
+  background-color: green;
+}
 
+/*--------------Panel 5 Display features-----------------------*/
+#displayfeaturespanel {
+  border: 1px solid black;
+  background-color: ivory;
+  padding: 0.5rem;
+}
 
+#displayr {
+  margin-top: 1.0rem;
+}
+
+#displayctm {
+  margin-top: 1.0rem;
+}
+
+#displaymd {
+  margin-top: 1.0rem;
+  margin-bottom: 1.0rem;
+}
 
 
 /*----------------------------------Right panel-----------------------------------------*/
@@ -95,20 +218,3 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
   background-color: white;
 }
 
-
-/*----------------------------------xxx slider--------------------------------------------------------------*/
-
-#xxxtitle {
-  font-size: 1.7rem;
-  padding-left: 0rem;
-  padding-top: 2.8rem;
-}
-
-#sliderdisplayarea {
-  position: relative;
-  height:6.0rem;
-}
-
-.icons {
-  margin-top: 2.6rem;
-}
