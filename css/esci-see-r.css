@@ -77,9 +77,35 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
   font-size: 1.6rem;
 }
 
+/*----------------tab-----------------*/
+
+#smarttab {
+  margin-top: 2px;
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+/*override*/
+.st-theme-round > .tab-content > .tab-pane {
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+/*---------------tab headers----------------------------------------------------------*/
+
+.nav-link {
+  font-size: 1.6rem !important;
+}
+
+/*----------------------------------same r tab----------------------------------------------------*/
+
+#tab-1 {
+  font-size: 1.5rem !important;
+}
+
 /*----------------------------------Panels-----------------------------------------------------*/
 
-/*--------------Panel 1 N-----------------------*/
+/*--------------Tab 1 Panel 1 N-----------------------*/
 #Npanel {
   border: 1px solid black;
   background-color: #FFFF99;
@@ -99,7 +125,7 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
   width: 4rem;
 }
 
-/*--------------Panel 2 r-----------------------*/
+/*--------------Tab 1 Panel 2 r-----------------------*/
 #rpanel {
   border: 1px solid black;
   background-color: #CCFFCC;
@@ -123,7 +149,7 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
   margin: 0.5rem;
 }
 
-/*--------------Panel 3 rho-----------------------*/
+/*--------------Tab 1 Panel 3 rho-----------------------*/
 #rhopanel {
   border: 1px solid black;
   background-color: #FFCC99;
@@ -156,17 +182,18 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 }
 
 
-/*--------------Panel 4 New data set-----------------------*/
+/*--------------Tab 1 Panel 4 New data set-----------------------*/
 #newdatasetpanel {
   border: 1px solid black;
   background-color: ivory;
   padding: 0.5rem;
+  height: 7rem;
 }
 
 #newdataset {
   padding: 0.7rem;
   width: 12rem;
-  height: 2.3rem;
+  height: 4rem;
   border: 1px solid black;
   border-radius: 5px;
   background-color: palegreen;
@@ -183,7 +210,7 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
   background-color: green;
 }
 
-/*--------------Panel 5 Display features-----------------------*/
+/*--------------Tab 1 Panel 5 Display features-----------------------*/
 #displayfeaturespanel {
   border: 1px solid black;
   background-color: ivory;
@@ -201,6 +228,20 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 #displaymd {
   margin-top: 1.0rem;
   margin-bottom: 1.0rem;
+}
+
+
+/*--------------------------------------Dance r tab------------------------------------------------------*/
+
+#tab-2 {
+  font-size: 1.5rem !important;
+}
+
+/*--------------Tab 2 Panel 1 Display s-----------------------*/
+#ypanel {
+  border: 1px solid black;
+  background-color: #FFFF99;
+  padding: 0.5rem;
 }
 
 

@@ -31,6 +31,8 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
     <title>esci-d-pictues</title>
 
     <!-- stylesheets -->
+    <link href=./css/smart_tab_esci.css rel=stylesheet type=text/css> 
+
     <link href=./css/ion.rangeSlider.css rel=stylesheet type=text/css>
 
     <link href=./css/tipped.css rel=stylesheet type=text/css />
@@ -46,6 +48,8 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 
     <script src=./js/d3.min.js></script>
 
+    <script src=./js/jquery.smartTab.min.js></script>
+
     <script src=./js/ion.rangeSlider.min.js></script>
 
     <script src=./js/tipped.min.js></script>
@@ -57,78 +61,116 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
   <body>
 
     <div id=main>
+    <!----------------------------------Main heading---------------------------------->
 
       <div id=leftpanel>
-<!----------------------------------Main heading---------------------------------->
         <div id=header>
           <div id=logo><img id=logoimg src=./images/logo.png></div>
           <div id=mainheading class=headingtip data-tooltip>esci web</div>
-          <div id=subheading class=headingtip data-tooltip>see-r (dev)</div>
+          <div id=subheading class=headingtip data-tooltip>see-<em>r</em> (dev)</div>
           <div id=tooltipsonoff>?</div>
         </div>
         <div id=breadcrumbs><span id=homecrumb class=hometip data-tooltip>Home></span><span id=distributioncrumb> see-r</span></div>
-        
-<!-------------------------------------Panels------------------------------------->        
-        <div id=panels>
 
-          <!-----------Panel 1 N------------------------------------------->
-          <div id=Npanel>
-            <div><span class=red>1 </span><em>N</em></div>
-            <div id=Nsliderpanel>
-              <div id=Nsliderdiv><input id=Nslider type=text/></div>
-              <div><img id=Nnudgebackward class="icons slidericons" src=./images/left.png alt='nudge backwards'></div>
-              <div><img id=Nnudgeforward class="icons slidericons" src=./images/right.png alt='nudge forward'></div>
-              <input id=Nval type=text>
+        <!---------------------------------Set up tabs------------------------------------------------->
+        <div id="smarttab">
+
+          <ul class="nav">
+            <li>
+              <a class="nav-link" href="#tab-1">Same <em>r</em></a>
+            </li>
+            <li>
+              <a class="nav-link" href="#tab-2">Dance <em>r</em></a>
+            </li>
+          </ul>
+       
+          <div class="tab-content">  
+            
+            <!------------------------------------Same r tab----------------------------------------->                
+            <div id="tab-1" class="tab-pane" role="tabpanel">
+            
+              <!-------------------------------------Tab 1 Panels------------------------------------->        
+              <div id=samerpanels>
+
+                <!-----------Panel 1 N------------------------------------------->
+                <div id=Npanel>
+                  <div><span class=red>1 </span><em>N</em></div>
+                  <div id=Nsliderpanel>
+                    <div id=Nsliderdiv><input id=Nslider type=text/></div>
+                    <div><img id=Nnudgebackward class="icons slidericons" src=./images/left.png alt='nudge backwards'></div>
+                    <div><img id=Nnudgeforward class="icons slidericons" src=./images/right.png alt='nudge forward'></div>
+                    <input id=Nval type=text>
+                  </div>
+
+                </div>
+
+                <!------------Panel 2 Generate dataset with chosen r------------->
+                <div id=rpanel>
+                  <div><span class=red>2 </span><input id=chosenr type=radio name=getdata checked=checked> data set with chosen <em>r</em></div>
+                  <div id=rsliderpanel>
+                    <div id=rsliderdiv><input id=rslider type=text/></div>
+                    <div><img id=rnudgebackward class="icons slidericons" src=./images/left.png alt='nudge backwards'></div>
+                    <div><img id=rnudgeforward class="icons slidericons" src=./images/right.png alt='nudge forward'></div>
+                    <input id=rval type=text>
+                  </div>
+                  <div id=calculatedrdiv><em>r</em> of dataset <span id=calculatedr>0.5</span></div>
+
+                </div>
+
+                <!------------Panel 3 Sample from population------------->
+                <div id=rhopanel>
+                  <div><span class=red>3 </span><input id=chosenrho type=radio name=getdata> Sample from population</div>
+                  <div id=populationrhodiv>Population correlation <em>&rho;</em></div>
+                  <div id=rhosliderpanel>
+                    <div id=rhosliderdiv><input id=rhoslider type=text/></div>
+                    <div><img id=rhonudgebackward class="icons slidericons" src=./images/left.png alt='nudge backwards'></div>
+                    <div><img id=rhonudgeforward class="icons slidericons" src=./images/right.png alt='nudge forward'></div>
+                    <input id=rhoval type=text>
+                  </div>
+                  <div id=calculatedrhodiv><em>r</em> of dataset <span id=calculatedrho>0.5</span></div>
+                  <div id=cionrhodiv>95% CI on <em>r</em> [<span id=cirhofrom class=backcolour>0.0</span>, <span id=cirhoto class=backcolour>0.0</span>]</div>
+                  <div id=cionrhoinfo class=small1>Data set is a random sample from the population</div>
+                </div>
+
+                <!------------Panel 4 New data set------------->
+                <div id=newdatasetpanel>
+                  <div><span class=red>4 </span></div>
+                  <div id=newdataset>New Data Set</div>
+                </div>
+
+                <!------------Panel 5 Display features------------->
+                <div id=displayfeaturespanel>
+                  <div><span class=red>5</span> Display features</div>
+                  <div><input id=displayr   type=checkbox> Display value of <em>r</em> in the figure</div>
+                  <div><input id=displayctm type=checkbox> Display cross through means</div>
+                  <div><input id=displaymd  type=checkbox> Display marginal distributions</div>
+
+                </div>
+
+              </div>
             </div>
 
-          </div>
+            <!-------------------------------------Dance r tab----------------------------------------->                
+            <div id="tab-2" class="tab-pane" role="tabpane1">
+              <!-------------------------------------Tab 2 Panels------------------------------------->        
+              <div id=dancerpanels>
+                <!-----------Panel y------------------------------------------->
+                <div id=ypanel>
+                  <div><span class=red>1 </span>y</div>
 
-          <!------------Panel 2 Generate dataset with chosen r------------->
-          <div id=rpanel>
-            <div><span class=red>2 </span><input id=chosenr type=radio name=getdata checked=checked> data set with chosen <em>r</em></div>
-            <div id=rsliderpanel>
-              <div id=rsliderdiv><input id=rslider type=text/></div>
-              <div><img id=rnudgebackward class="icons slidericons" src=./images/left.png alt='nudge backwards'></div>
-              <div><img id=rnudgeforward class="icons slidericons" src=./images/right.png alt='nudge forward'></div>
-              <input id=rval type=text>
+                  </div>
+
+                </div>
+
+
+
+              </div>
             </div>
-            <div id=calculatedrdiv><em>r</em> of dataset <span id=calculatedr>0.5</span></div>
 
-          </div>
-
-          <!------------Panel 3 Sample from population------------->
-          <div id=rhopanel>
-            <div><span class=red>3 </span><input id=chosenrho type=radio name=getdata> Sample from population</div>
-            <div id=populationrhodiv>Population correlation <em>&rho;</em></div>
-            <div id=rhosliderpanel>
-              <div id=rhosliderdiv><input id=rhoslider type=text/></div>
-              <div><img id=rhonudgebackward class="icons slidericons" src=./images/left.png alt='nudge backwards'></div>
-              <div><img id=rhonudgeforward class="icons slidericons" src=./images/right.png alt='nudge forward'></div>
-              <input id=rhoval type=text>
-            </div>
-            <div id=calculatedrhodiv><em>r</em> of dataset <span id=calculatedrho>0.5</span></div>
-            <div id=cionrhodiv>95% CI on <em>r</em> [<span id=cirhofrom class=backcolour>0.0</span>, <span id=cirhoto class=backcolour>0.0</span>]</div>
-            <div id=cionrhoinfo class=small1>Data set is a random sample from the population</div>
-          </div>
-
-          <!------------Panel 4 New data set------------->
-          <div id=newdatasetpanel>
-            <div><span class=red>4 </span></div>
-            <div id=newdataset>New Data Set</div>
-          </div>
-
-          <!------------Panel 5 Display features------------->
-          <div id=displayfeaturespanel>
-            <div><span class=red>5</span> Display features</div>
-            <div><input id=displayr   type=checkbox> Display value of <em>r</em> in the figure</div>
-            <div><input id=displayctm type=checkbox> Display cross through means</div>
-            <div><input id=displaymd  type=checkbox> Display marginal distributions</div>
-
-          </div>
-
+          </div>    
         </div>
 
-<!---------------------------------Footer---------------------------------------------->
+        <!---------------------------------Footer---------------------------------------------->
         <div id=footer>
           <div id=footerlink data-tooltip>Click to return to the New Statistics site</div>
         </div>
@@ -143,7 +185,7 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
         <div id=zzz></div>
       </div>
 
-<!------------------------------------------------------------------------------------->
+  <!------------------------------------------------------------------------------------->
     </div>
 
   </body>

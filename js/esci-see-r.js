@@ -22,6 +22,8 @@ $(function() {
   //#region for variable definitions (just allows code folding)
   let tooltipson              = false;                                        //toggle the tooltips on or off
 
+  let tab                     = 'Same r';  
+
   const display               = document.querySelector('#display');        //display of pdf area
 
   let realHeight              = 100;                                          //the real world height for the pdf display area
@@ -105,6 +107,32 @@ $(function() {
 
   function initialise() {
 
+    //tabs
+    $('#smarttab').smartTab({
+      selected: 0, // Initial selected tab, 0 = first tab
+      theme: 'round', // theme for the tab, related css need to include for other than default theme
+      orientation: 'horizontal', // Nav menu orientation. horizontal/vertical
+      justified: true, // Nav menu justification. true/false
+      autoAdjustHeight: true, // Automatically adjust content height
+      backButtonSupport: true, // Enable the back button support
+      enableURLhash: true, // Enable selection of the tab based on url hash
+      transition: {
+          animation: 'slide-horizontal', // Effect on navigation, none/fade/slide-horizontal/slide-vertical/slide-swing
+          speed: '400', // Transion animation speed
+          //easing:'' // Transition animation easing. Not supported without a jQuery easing plugin
+      },
+      autoProgress: { // Auto navigate tabs on interval
+          enabled: false, // Enable/Disable Auto navigation
+          interval: 3500, // Auto navigate Interval (used only if "autoProgress" is set to true)
+          stopOnFocus: true, // Stop auto navigation on focus and resume on outfocus
+      },
+      keyboardSettings: {
+          keyNavigation: true, // Enable/Disable keyboard navigation(left and right keys are used if enabled)
+          keyLeft: [37], // Left key code
+          keyRight: [39] // Right key code
+      }
+    });    
+
     setTooltips();
 
     //get initial values for height/width
@@ -127,6 +155,22 @@ $(function() {
 
   }
 
+  //Switch tabs
+  $("#smarttab").on("showTab", function(e, anchorObject, tabIndex) {
+    if (tabIndex === 0) {
+      tab = 'Same r';
+
+    }
+    if (tabIndex === 1) {
+      tab = 'Dance r';
+
+    }
+
+    setupSliders();
+
+    clear();
+  });  
+
   function resize() {
     //have to watch out as the width and height do not always seem precise to pixels
     //browsers apparently do not expose true element width, height.
@@ -139,6 +183,7 @@ $(function() {
 
     clear();
   }
+
 
   function setupSliders() {
 
