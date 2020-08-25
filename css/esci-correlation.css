@@ -1,8 +1,8 @@
 /*
-Program       esci-d-picture.css
+Program       esci-correlation.css
 Author        Gordon Moore
 Date          20 August 2020
-Description   CSS for esci see-r
+Description   CSS for esci correlation
 Licence       GNU General Public LIcence Version 3, 29 June 2007
 */
 
@@ -103,23 +103,32 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
   font-size: 1.5rem !important;
 }
 
+#tab1text {
+  border: 1px solid black;
+  font-size: 1.5rem;
+  padding-left: 0.5rem;;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+}
+
 /*----------------------------------Panels-----------------------------------------------------*/
 
-/*--------------Tab 1 Panel 1 N-----------------------*/
-#Npanel {
+/*--------------Tab 1 Panel 1 N1-----------------------*/
+#N1panel {
   border: 1px solid black;
   background-color: #FFFF99;
   padding: 0.5rem;
 }
 
-#Nsliderpanel {
+#N1sliderpanel {
   display: grid;
   grid-template-columns: 25rem 2rem 3rem 5rem;
   grid-row-gap: 3rem;
   margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
-#Nval {
+#N1val {
   margin-top: 3.0rem;
   height: 2rem;
   width: 4rem;
@@ -149,45 +158,14 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
   margin: 0.5rem;
 }
 
-/*--------------Tab 1 Panel 3 rho-----------------------*/
-#rhopanel {
-  border: 1px solid black;
-  background-color: #FFCC99;
-  padding: 0.5rem;
-}
-
-#rhosliderpanel {
-  display: grid;
-  grid-template-columns: 25rem 2rem 3rem 5rem;
-  grid-row-gap: 3rem;
-  margin-top: 1rem;
-}
-
-#rhoval {
-  margin-top: 3.0rem;
-  height: 2rem;
-  width: 4rem;
-}
-
-#calculatedrhodiv {
-  margin: 0.5rem;
-}
-
-#cionrhodiv {
-  margin: 0.5rem;
-}
-
-#cionrhoinfo {
-  margin: 0.5rem;
-}
 
 
-/*--------------Tab 1 Panel 4 New data set-----------------------*/
+/*--------------Tab 1 Panel 3 New data set-----------------------*/
 #newdatasetpanel {
   border: 1px solid black;
   background-color: ivory;
   padding: 0.5rem;
-  height: 7rem;
+  height: 9rem;
 }
 
 #newdataset {
@@ -210,10 +188,10 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
   background-color: green;
 }
 
-/*--------------Tab 1 Panel 5 Display features-----------------------*/
+/*--------------Tab 1 Panel 4 Display features-----------------------*/
 #displayfeaturespanel {
   border: 1px solid black;
-  background-color: ivory;
+  background-color: #CCFFFF;
   padding: 0.5rem;
 }
 
@@ -230,6 +208,34 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
   margin-bottom: 1.0rem;
 }
 
+/*--------------Tab 1 Panel 5 Descriptive statistics 1-----------------------*/
+#displaystatistics1spanel {
+  border: 1px solid black;
+  background-color: #D2C4EE;
+  padding: 0.5rem;
+}
+
+#statistics1 {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  margin-bottom: 1rem;
+}
+
+
+/*--------------Tab 1 Panel 6 Display lines-----------------------*/
+#displaylines1panel {
+  border: 1px solid black;
+  background-color: papayawhip;
+  padding: 0.5rem;
+
+}
+
+#displaylines1{
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
 
 /*--------------------------------------Dance r tab------------------------------------------------------*/
 
@@ -237,11 +243,65 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
   font-size: 1.5rem !important;
 }
 
-/*--------------Tab 2 Panel 1 Display s-----------------------*/
-#ypanel {
+#tab2text {
+  border: 1px solid black;
+  font-size: 1.5rem;
+  padding-left: 0.5rem;;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+}
+
+/*--------------Tab 2 Panel 1 N-----------------------*/
+#N2panel {
   border: 1px solid black;
   background-color: #FFFF99;
   padding: 0.5rem;
+}
+
+#N2sliderpanel {
+  display: grid;
+  grid-template-columns: 25rem 2rem 3rem 5rem;
+  grid-row-gap: 3rem;
+  margin-top: 1rem;
+}
+
+#N2val {
+  margin-top: 3.0rem;
+  height: 2rem;
+  width: 4rem;
+}
+
+/*--------------Tab 2 Panel 2 rho-----------------------*/
+#rhopanel {
+  border: 1px solid black;
+  background-color: #FFCC99;
+  padding: 0.5rem;
+}
+
+#rhosliderpanel {
+  display: grid;
+  grid-template-columns: 25rem 2rem 3rem 5rem;
+  grid-row-gap: 3rem;
+  margin-top: 1rem;
+}
+
+#rhoval {
+  margin-top: 3.0rem;
+  height: 2rem;
+  width: 4rem;
+}
+
+#calculatedrhodiv {
+  margin-left: 0.5rem;
+  margin-bottom: 1.0rem;
+}
+
+#cionrhodiv {
+  margin: 0.5rem;
+}
+
+#cionrhoinfo {
+  margin: 0.5rem;
 }
 
 
@@ -252,6 +312,11 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
   grid-template-rows: 5fr 1fr;
 }
 
+/*----------------------------------footer override---------------------------------*/
+
+#footer {
+  font-size: 1.4rem !important;
+}
 
 /*----------------------------------display-------------------------------------------------------------*/
 

@@ -1,4 +1,4 @@
-# esci-d-see-r
+# esci-correlation
 
 ## Current version 0.0.1
 
@@ -18,4 +18,4 @@ https://thenewstatistics.com/
 
 It uses D3 for some aspects, jQuery, jStat and tippedjs (for tooltips) and at times just plain old JavaScript which reaches the parts other libraries cannot ;)
 
-![The esci-see-r page](images/esci-see-r-view.png?raw=true "esci-see-r page")
+![The esci-see-r page](images/esci-correlation-view.png?raw=true "esci-correlation page")

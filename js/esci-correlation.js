@@ -1,8 +1,8 @@
 /*
-Program       esci-see-r.js
+Program       esci-correlation.js
 Author        Gordon Moore
 Date          20 August 2020
-Description   The JavaScript code for esci-see-r
+Description   The JavaScript code for esci-correlation
 Licence       GNU General Public Licence Version 3, 29 June 2007
 */
 
@@ -22,7 +22,7 @@ $(function() {
   //#region for variable definitions (just allows code folding)
   let tooltipson              = false;                                        //toggle the tooltips on or off
 
-  let tab                     = 'Same r';  
+  let tab                     = 'correlation';  
 
   const display               = document.querySelector('#display');        //display of pdf area
 
@@ -43,34 +43,27 @@ $(function() {
 
   let sliderinuse = false;
 
-  //panel 1 N
-  let $Nslider;
-  let N = 4;
-  const $Nval = $('#Nval');
-  $Nval.val(N.toFixed(0));
-  const $Nnudgebackward = $('#Nnudgebackward');
-  const $Nnudgeforward = $('#Nnudgeforward');
+  //tab 1 panel 1 N1
+  let $N1slider;
+  let N1 = 4;
+  const $N1val = $('#N1val');
+  $N1val.val(N1.toFixed(0));
+  const $N1nudgebackward = $('#N1nudgebackward');
+  const $N1nudgeforward = $('#N1nudgeforward');
 
-  //panel 2 r
+  //tab 1 panel 2 r
   let $rslider;
   let r = 0.5;
   const $rval = $('#rval');
-  $rval.val(r.toFixed(1));
+  $rval.val(r.toFixed(2).toString().replace('0.', '.'));
+  const $calculatedr = $('#calculatedr');
   const $rnudgebackward = $('#rnudgebackward');
   const $rnudgeforward = $('#rnudgeforward');
 
-  //panel 3 rho
-  let $rhoslider;
-  let rho = 0.5;
-  const $rhoval = $('#rhoval');
-  $rhoval.val(rho.toFixed(1));
-  const $rhonudgebackward = $('#rhonudgebackward');
-  const $rhonudgeforward = $('#rhonudgeforward');
-
-  //panel 4 New data set
+  //tab 1 panel 3 New data set
   const $newdataset = $('#newdataset');
   
-  //panel 5 Display features
+  //tab 1 panel 4 Display features
   const $displayr = $('#displayr');
   let displayr;
 
@@ -80,6 +73,42 @@ $(function() {
   const $displaymd = $('#displaymd');
   let displaymd;
 
+  //tab 1 panel 5 Descriptive statstics
+  const $statistics1 = $('#statistics1');
+  const $statistics1show = $('#statistics1show');
+  let statistics1show = false;
+
+  
+  //tab 1 panel 6 Display lines
+  const $displaylines1 = $('#displaylines1');
+  const $displaylines1show = $('#displaylines1show');
+  let displaylines1show = false;
+
+  const $corryx = $('#corryx');
+  let corryx;
+  
+  const $corrxy = $('#corrxy');
+  let corrxy;
+
+  const $corrlineslope = $('#corrlineslope');
+  let corrlineslope;
+
+  //tab 2 panel 1 N2
+  let $N2slider;
+  let N2 = 4;
+  const $N2val = $('#N2val');
+  $N2val.val(N2.toFixed(0));
+  const $N2nudgebackward = $('#N2nudgebackward');
+  const $N2nudgeforward = $('#N2nudgeforward');
+  
+  //tab 2 panel 2 rho
+  let $rhoslider;
+  let rho = 0.5;
+  const $rhoval = $('#rhoval');
+  $rhoval.val(rho.toFixed(2).toString().replace('0.', '.'));
+  const $calculatedrho = $('#calculatedrho');
+  const $rhonudgebackward = $('#rhonudgebackward');
+  const $rhonudgeforward = $('#rhonudgeforward');
 
 
   let svgD;   
@@ -117,7 +146,7 @@ $(function() {
       backButtonSupport: true, // Enable the back button support
       enableURLhash: true, // Enable selection of the tab based on url hash
       transition: {
-          animation: 'slide-horizontal', // Effect on navigation, none/fade/slide-horizontal/slide-vertical/slide-swing
+          animation: 'none', // Effect on navigation, none/fade/slide-horizontal/slide-vertical/slide-swing
           speed: '400', // Transion animation speed
           //easing:'' // Transition animation easing. Not supported without a jQuery easing plugin
       },
@@ -149,8 +178,6 @@ $(function() {
 
     resize();
 
-
-
     clear();
 
   }
@@ -158,7 +185,7 @@ $(function() {
   //Switch tabs
   $("#smarttab").on("showTab", function(e, anchorObject, tabIndex) {
     if (tabIndex === 0) {
-      tab = 'Same r';
+      tab = 'correlation';
 
     }
     if (tabIndex === 1) {
@@ -187,7 +214,7 @@ $(function() {
 
   function setupSliders() {
 
-    $('#Nslider').ionRangeSlider({
+    $('#N1slider').ionRangeSlider({
       skin: 'big',
       grid: true,
       grid_num: 6,
@@ -199,14 +226,14 @@ $(function() {
       prettify: prettify0,
       //on slider handles change
       onChange: function (data) {
-        N = data.from;
-        sliderinuse = true;  //don't update dslider in updateN()
-        updateN();
-        $('#Nval').val(N.toFixed(0));
+        N1 = data.from;
+        sliderinuse = true;  //don't update dslider in updateN1()
+        updateN1();
+        $N1val.val(N1.toFixed(0));
         redrawDisplay();
       }
     })
-    $Nslider = $('#Nslider').data("ionRangeSlider");
+    $N1slider = $('#N1slider').data("ionRangeSlider");
 
     $('#rslider').ionRangeSlider({
       skin: 'big',
@@ -216,18 +243,41 @@ $(function() {
       min: -1,
       max: 1,
       from: 0.5,
-      step: 0.1,
-      prettify: prettify1,
+      step: 0.01,
+      prettify: prettify2,
       //on slider handles change
       onChange: function (data) {
         r = data.from;
-        sliderinuse = true;  //don't update dslider in updateN()
+        sliderinuse = true;  //don't update dslider in updater()
         updater();
-        $('#rval').val(r.toFixed(1));
+        $rval.val(r.toFixed(2).toString().replace('0.', '.'));
+        $calculatedr.text(r.toFixed(2).toString().replace('0.', '.'))
         redrawDisplay();
       }
     })
     $rslider = $('#rslider').data("ionRangeSlider");
+
+    $('#N2slider').ionRangeSlider({
+      skin: 'big',
+      grid: true,
+      grid_num: 6,
+      type: 'single',
+      min: 0,
+      max: 300,
+      from: 4,
+      step: 1,
+      prettify: prettify0,
+      //on slider handles change
+      onChange: function (data) {
+        N2 = data.from;
+        sliderinuse = true;  //don't update dslider in updateN2()
+        updateN2();
+        $N2val.val(N2.toFixed(0));
+        redrawDisplay();
+      }
+    })
+    $N2slider = $('#N2slider').data("ionRangeSlider");
+
 
     $('#rhoslider').ionRangeSlider({
       skin: 'big',
@@ -237,14 +287,16 @@ $(function() {
       min: -1,
       max: 1,
       from: 0.5,
-      step: 0.1,
-      prettify: prettify1,
+      step: 0.01,
+      prettify: prettify2,
       //on slider handles change
       onChange: function (data) {
         rho = data.from;
-        sliderinuse = true;  //don't update dslider in updateN()
+        sliderinuse = true;  //don't update dslider in updaterho()
         updater();
-        $('#rhoval').val(rho.toFixed(1));
+        $rhoval.val(rho.toFixed(2).toString().replace('0.', '.'));
+        $calculatedrho.text(rho.toFixed(2).toString().replace('0.', '.'))
+
         redrawDisplay();
       }
     })
@@ -253,8 +305,14 @@ $(function() {
   }
 
 
-  function updateN() {
-    if (!sliderinuse) $Nslider.update({ from: N })
+  function updateN1() {
+    if (!sliderinuse) $N1slider.update({ from: N1 })
+    sliderinuse = false;
+    redrawDisplay();
+  }
+
+  function updateN2() {
+    if (!sliderinuse) $N2slider.update({ from: N2 })
     sliderinuse = false;
     redrawDisplay();
   }
@@ -277,28 +335,41 @@ $(function() {
   }
 
   function prettify1(n) {
-    return n.toFixed(1);
+    return n.toFixed(1).toString().replace('0.', '.');
   }
 
   function prettify2(n) {
-    return n.toFixed(2);
+    return n.toFixed(2).toString().replace('0.', '.');
   }
 
 
   //set everything to a default state.
   function clear() {
     //set sliders to initial
-    N = 4;
-    updateN();
-    $Nval.text(N.toFixed(0));
+
+
+    N1 = 4;
+    updateN1();
+    $N1val.text(N1.toFixed(0));
+
+    N2 = 4;
+    updateN2();
+    $N2val.text(N2.toFixed(0));
 
     r = 0.5;
     updater();
-    $rval.text(r.toFixed(1));    
+    $rval.text(r.toFixed(2).toString().replace('0.', '.'));    
+    $calculatedr.text(r.toFixed(2).toString().replace('0.', '.')); 
 
     rho = 0.5;
     updater();
-    $rhoval.text(rho.toFixed(1));  
+    $rhoval.text(rho.toFixed(2).toString().replace('0.', '.'));  
+    $calculatedrho.text(rho.toFixed(2).toString().replace('0.', '.')); 
+
+    //$statistics1.hide();
+    //$statistics1.css('display', 'none');
+    //$displaylines1.hide();
+    //$displaylines1.css('display', 'none');
   }
 
   function redrawDisplay() {
@@ -329,81 +400,122 @@ $(function() {
   })
 
 
-/*----------------------------------------N nudge bars-----------*/
-  //changes to N
-  $Nval.on('change', function() {
-    if ( isNaN($Nval.val()) ) {
-      $Nval.val(N.toFixed(0));
-      return;
-    };
-    N = parseFloat($Nval.val()).toFixed(0);
-    if (N < 4) {
-      N = 4;
-    }
-    if (N > 300) {
-      N = 300;
-    }
-    $Nval.val(N.toFixed(0));
-    updateN();
-  })
-
-  $Nnudgebackward.on('mousedown', function() {
-    Nnudgebackward();
-    pauseId = setTimeout(function() {
-      repeatId = setInterval ( function() {
-        Nnudgebackward();
-      }, delay );
-    }, pause)
-  })
-
-  $Nnudgebackward.on('mouseup', function() {
-    clearInterval(repeatId);
-    clearTimeout(pauseId);
-  })
-
-  function Nnudgebackward() {
-    N -= 1;
-    if (N < 4) N = 4;
-    $Nval.val(N.toFixed(0));
-    updateN();
+//show statistics
+$statistics1show.on('change', function() {
+  statistics1show = $statistics1show.prop('checked');
+  if (statistics1show) {
+    $statistics1.show();
+  }
+  else {
+    $statistics1.hide();
   }
 
-  $Nnudgeforward.on('mousedown', function() {
-    Nnudgeforward();
+})
+
+
+//show display lines
+$displaylines1show.on('change', function() {
+  displaylines1show = $displaylines1show.prop('checked');
+  if (displaylines1show) {
+    $displaylines1.show();
+  }
+  else {
+    $displaylines1.hide();
+  }
+})
+
+$corryx.on('change', function() {
+  corryx = $corryx.is(':checked');
+
+})
+
+$corrxy.on('change', function() {
+  corrxy = $xorrxy.is(':checked');
+
+})
+
+$corrlineslope.on('change', function() {
+  corrlineslope = $corrlineslope.is(':checked');
+
+})
+
+/*----------------------------------------N1 nudge bars-----------*/
+  //changes to N
+  $N1val.on('change', function() {
+    if ( isNaN($N1val.val()) ) {
+      $N1val.val(N1.toFixed(0));
+      return;
+    };
+    N1 = parseFloat($N1val.val()).toFixed(0);
+    if (N1 < 4) {
+      N1 = 4;
+    }
+    if (N1 > 300) {
+      N1 = 300;
+    }
+    $N1val.val(N1.toFixed(0));
+    updateN1();
+  })
+
+  $N1nudgebackward.on('mousedown', function() {
+    N1nudgebackward();
     pauseId = setTimeout(function() {
       repeatId = setInterval ( function() {
-        Nnudgeforward();
+        N1nudgebackward();
       }, delay );
     }, pause)
   })
 
-  $Nnudgeforward.on('mouseup', function() {
+  $N1nudgebackward.on('mouseup', function() {
     clearInterval(repeatId);
     clearTimeout(pauseId);
   })
 
-  function Nnudgeforward() {
-    N += 1;
-    if (N > 300) N = 300;
-    $Nval.val(N.toFixed(0));
-    updateN();
+  function N1nudgebackward() {
+    N1 -= 1;
+    if (N1 < 4) N = 4;
+    $N1val.val(N1.toFixed(0));
+    updateN1();
+  }
+
+  $N1nudgeforward.on('mousedown', function() {
+    N1nudgeforward();
+    pauseId = setTimeout(function() {
+      repeatId = setInterval ( function() {
+        N1nudgeforward();
+      }, delay );
+    }, pause)
+  })
+
+  $N1nudgeforward.on('mouseup', function() {
+    clearInterval(repeatId);
+    clearTimeout(pauseId);
+  })
+
+  function N1nudgeforward() {
+    N1 += 1;
+    if (N1 > 300) N1 = 300;
+    $N1val.val(N1.toFixed(0));
+    updateN1();
   }
 
 /*----------------------------------------r nudge bars-----------*/
   //changes to r
   $rval.on('change', function() {
     if ( isNaN($rval.val()) ) {
-      $rval.val(r.toFixed(1));
+      $rval.val(r.toFixed(2).toString().replace('0.', '.'));
+      $calculatedr.text(r.toFixed(2).toString().replace('0.', '.'));
       return;
     };
-    r = parseFloat($rval.val()).toFixed(1);
+    r = parseFloat($rval.val());
     if (r < -1) {
       r = -1;
     }
     if (r > 1) {
       r = 1;
     }
-    $rval.val(r.toFixed(1));
+    $rval.val(r.toFixed(2).toString().replace('0.', '.'));
+    $calculatedr.text(r.toFixed(2).toString().replace('0.', '.'));
     updater();
   })
 
@@ -422,9 +534,10 @@ $(function() {
   })
 
   function rnudgebackward() {
-    r -= 0.1;
+    r -= 0.01;
     if (r < -1) r = -1;
-    $rval.val(r.toFixed(1));
+    $rval.val(r.toFixed(2).toString().replace('0.', '.'));
+    $calculatedr.text(r.toFixed(2).toString().replace('0.', '.'));
     updater();
   }
 
@@ -443,27 +556,92 @@ $(function() {
   })
 
   function rnudgeforward() {
-    r += 0.1;
+    r += 0.01;
     if (r > 1) r = 1;
-    $rval.val(r.toFixed(1));
+    $rval.val(r.toFixed(1).toString().replace('0.', '.'));
+    $calculatedr.text(r.toFixed(2).toString().replace('0.', '.'));
     updater();
   }
+
+
+/*----------------------------------------N2 nudge bars-----------*/
+  //changes to N
+  $N2val.on('change', function() {
+    if ( isNaN($N2val.val()) ) {
+      $N2val.val(N.toFixed(0));
+      return;
+    };
+    N2 = parseFloat($N2val.val()).toFixed(0);
+    if (N2 < 4) {
+      N2 = 4;
+    }
+    if (N2 > 300) {
+      N2 = 300;
+    }
+    $N2val.val(N2.toFixed(0));
+    updateN2();
+  })
+
+  $N2nudgebackward.on('mousedown', function() {
+    N2nudgebackward();
+    pauseId = setTimeout(function() {
+      repeatId = setInterval ( function() {
+        N2nudgebackward();
+      }, delay );
+    }, pause)
+  })
+
+  $N2nudgebackward.on('mouseup', function() {
+    clearInterval(repeatId);
+    clearTimeout(pauseId);
+  })
+
+  function N2nudgebackward() {
+    N2 -= 1;
+    if (N2 < 4) N2 = 4;
+    $N2val.val(N2.toFixed(0));
+    updateN2();
+  }
+
+  $N2nudgeforward.on('mousedown', function() {
+    N2nudgeforward();
+    pauseId = setTimeout(function() {
+      repeatId = setInterval ( function() {
+        N2nudgeforward();
+      }, delay );
+    }, pause)
+  })
+
+  $N2nudgeforward.on('mouseup', function() {
+    clearInterval(repeatId);
+    clearTimeout(pauseId);
+  })
+
+  function N2nudgeforward() {
+    N2 += 1;
+    if (N2 > 300) N2 = 300;
+    $N2val.val(N2.toFixed(0));
+    updateN2();
+  }
+
 
 /*----------------------------------------rho nudge bars-----------*/
   //changes to rho
   $rhoval.on('change', function() {
     if ( isNaN($rhoval.val()) ) {
-      $rhoval.val(rho.toFixed(1));
+      $rhoval.val(rho.toFixed(2).toString().replace('0.', '.'));
+      $calculatedrho.text(rho.toFixed(2).toString().replace('0.', '.'));
       return;
     };
-    rho = parseFloat($rval.val()).toFixed(1);
+    rho = parseFloat($rval.val());
     if (rho < -1) {
       rho = -1;
     }
     if (rho > 1) {
       rho = 1;
     }
-    $rhoval.val(rho.toFixed(1));
+    $rhoval.val(rho.toFixed(2).toString().replace('0.', '.'));
+    $calculatedrho.text(rho.toFixed(2).toString().replace('0.', '.'));
     updaterho();
   })
 
@@ -482,9 +660,10 @@ $(function() {
   })
 
   function rhonudgebackward() {
-    rho -= 0.1;
+    rho -= 0.01;
     if (rho < -1) rho = -1;
-    $rhoval.val(rho.toFixed(1));
+    $rhoval.val(rho.toFixed(1).toString().replace('0.', '.'));
+    $calculatedrho.text(rho.toFixed(2).toString().replace('0.', '.'));
     updaterho();
   }
 
@@ -503,9 +682,10 @@ $(function() {
   })
 
   function rhonudgeforward() {
-    rho += 0.1;
+    rho += 0.01;
     if (rho > 1) rho = 1;
-    $rhoval.val(rho.toFixed(1));
+    $rhoval.val(rho.toFixed(1).toString().replace('0.', '.'));
+    $calculatedrho.text(rho.toFixed(2).toString().replace('0.', '.'));
     updaterho();
   }
 
