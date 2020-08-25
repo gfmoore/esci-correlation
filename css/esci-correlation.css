@@ -82,6 +82,10 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 
 /*----------------------------------Panels-----------------------------------------------------*/
 
+#panels {
+  font-size:1.5rem;
+}
+
 /*--------------Tab 1 Panel 1 N1-----------------------*/
 #N1panel {
   border: 1px solid black;
@@ -128,7 +132,6 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 }
 
 
-
 /*--------------Tab 1 Panel 3 New data set-----------------------*/
 #newdatasetpanel {
   border: 1px solid black;
@@ -138,15 +141,16 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 }
 
 #newdataset {
-  padding: 0.7rem;
+  padding-top: 0.8rem;
+  padding-left: 0.8rem;
   width: 12rem;
-  height: 4rem;
+  height: 3rem;
   border: 1px solid black;
   border-radius: 5px;
   background-color: palegreen;
   margin-top: -1rem;
   margin-bottom: 0.5rem;
-  margin-left: 5rem;
+  margin-left: 2rem;
 }
 
 #newdataset:hover {
