@@ -214,7 +214,7 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 #rightpanel {
   border: 1px solid grey;
   display: grid;
-  grid-template-rows: 5fr 1fr;
+  grid-template-rows: auto;
 }
 
 /*----------------------------------footer override---------------------------------*/
@@ -227,5 +227,9 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 
 #display {
   background-color: white;
+  border: 2px solid red;
+  position: sticky; /*keeps div at top when vertical scrolling*/
+  top: 0;
 }
+
 

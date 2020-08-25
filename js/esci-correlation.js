@@ -24,10 +24,11 @@ $(function() {
 
   const display               = document.querySelector('#display');        //display of pdf area
 
-  let realHeight              = 100;                                          //the real world height for the pdf display area
-  let margin                  = {top: 0, right: 10, bottom: 0, left: 70};     //margins for pdf display area
-  let width;                                                                  //the true width of the pdf display area in pixels
-  let heightP;   
+  let margin;     //margins for pdf display area
+
+  let widthD;                                                                //the true width of the pdf display area in pixels
+  let heightD;   
+
   let rwidth;                                                                 //the width returned by resize
   let rheight;                                                                //the height returned by resize
   
@@ -93,6 +94,8 @@ $(function() {
 
 
   let svgD;   
+  let svgHorizontalAxis;
+  let svgVerticalAxis;
                                                                               //the svg reference to pdfdisplay
   const $display            = $('#display');
 
@@ -102,7 +105,8 @@ $(function() {
     entries.forEach(entry => {
       rwidth = entry.contentRect.width;
       //rHeight = entry.contentRect.height;  //doesn't work
-      rheight = $('#display').outerHeight(true);
+      //rheight = $('#display').outerHeight(true);
+      rheight = window.innerHeight;
     });
   });
 
@@ -116,18 +120,20 @@ $(function() {
   initialise();
 
   function initialise() {
-
+    margin = {top: 30, right: 0, bottom: 20, left: 70}; 
 
     setTooltips();
 
     //get initial values for height/width
     rwidth  = $('#display').outerWidth(true);
-    rheight = $('#display').outerHeight(true);
+    //rheight = $('#display').outerHeight(true);
+    rheight = window.innerHeight -20;
 
     d3.selectAll('svg > *').remove();  //remove all elements under svgP
     $('svg').remove();                 //remove the all svg elements from the DOM
 
     //pdf display
+    $('#display').css('height', rheight);
     svgD = d3.select('#display').append('svg').attr('width', '100%').attr('height', '100%');
 
     setupSliders(); 
@@ -145,9 +151,17 @@ $(function() {
     //also have to think about box model. outerwidth(true) gets full width, not sure resizeObserver does.
 
     resizeObserver.observe(display);  //note doesn't get true outer width, height
+    rheight = window.innerHeight;
 
-    width   = rwidth - margin.left - margin.right;  
-    heightP = rheight - margin.top - margin.bottom;
+    widthD   = rwidth - margin.left - margin.right;  
+    heightD  = rheight - margin.top - margin.bottom;
+
+    //set the height of the display div
+    d3.selectAll('svg > *').remove();  //remove all elements under svgP
+    $('svg').remove();                 //remove the all svg elements from the DOM
+
+    $('#display').css('height', rheight-50);
+    svgD = d3.select('#display').append('svg').attr('width', '100%').attr('height', '100%');
 
     clear();
   }
@@ -233,8 +247,6 @@ $(function() {
   //set everything to a default state.
   function clear() {
     //set sliders to initial
-
-
     N1 = 4;
     updateN1();
     $N1val.text(N1.toFixed(0));
@@ -246,6 +258,87 @@ $(function() {
 
     $statistics1.hide();
     $displaylines1.hide();
+
+    setupAxes();
+
+  }
+
+  function setupAxes() {
+    //clear axes
+    d3.selectAll('.xaxis').remove();
+    d3.selectAll('.yaxis').remove();
+    d3.selectAll('.axistext').remove();
+
+
+    d3.selectAll('.test').remove();
+
+    widthD = $('#display').outerWidth(true) - margin.left - margin.right;
+    x = d3.scaleLinear().domain([-3, 3]).range([margin.left, widthD+margin.left-20]);
+
+    heightD = $('#display').outerHeight(true) - margin.top - margin.bottom;
+    y = d3.scaleLinear().domain([-3, 3]).range([heightD, margin.top]);
+    
+    //or? widthD   = rwidth - margin.left - margin.right; 
+
+    let xAxis = d3.axisBottom(x).tickPadding([10]); //.ticks(20); //.tickValues([]);
+    svgD.append('g').attr('class', 'xaxis').style("font", "1.5rem sans-serif").style('padding-top', '0.5rem').attr( 'transform', `translate(0, ${heightD})` ).call(xAxis);
+
+    let yAxis = d3.axisLeft(y).tickPadding([10]); //.ticks(20); //.tickValues([]);
+    svgD.append('g').attr('class', 'yaxis').style("font", "1.5rem sans-serif").attr( 'transform', `translate(${margin.left}, 0)` ).call(yAxis);
+
+
+    //add some axis labels
+    svgD.append('text').text('X').attr('class', 'axistext').attr('x', x(0)).attr('y', y(-3)+45).attr('text-anchor', 'start').attr('fill', 'black').style('font-size', '2.0rem').style('font-weight', 'bold').style('font-style', 'italic');
+    svgD.append('text').text('Y').attr('class', 'axistext').attr('x', x(-3)-60).attr('y', y(0)).attr('text-anchor', 'start').attr('fill', 'black').style('font-size', '2.0rem').style('font-weight', 'bold').style('font-style', 'italic');
+
+    //add additional ticks for x scale
+    //the minor ticks
+    let interval = d3.ticks(-3, 3, 10);  //gets an array of where it is putting tick marks
+
+    let i;
+    let minortick;
+    let minortickmark;
+
+    for (i=1; i < interval.length; i += 1) {
+      minortick = (interval[i] - interval[i-1]) / 10;
+      for (let ticks = 1; ticks <= 10; ticks += 1) {
+        minortickmark = interval[i-1] + (minortick * ticks);
+        if (minortickmark > -3 && minortickmark < 3) svgD.append('line').attr('class', 'xaxis').attr('x1', x(minortickmark)).attr('y1', 0).attr('x2', x(minortickmark) ).attr('y2', 5).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, ${heightD})` );
+      }
+    }
+
+    //make larger middle tick
+    for (i = 1; i < interval.length; i += 1) {
+      svgD.append('line').attr('class', 'xaxis').attr('x1', x(interval[i-1])).attr('y1', 0).attr('x2', x(interval[i-1]) ).attr('y2', 10).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, ${heightD})` );
+      middle = (interval[i] + interval[i-1]) / 2;
+      svgD.append('line').attr('class', 'xaxis').attr('x1', x(middle)).attr('y1', 0).attr('x2', x(middle) ).attr('y2', 10).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, ${heightD})` );
+    }
+    svgD.append('line').attr('class', 'xaxis').attr('x1', x(interval[i-1])).attr('y1', 0).attr('x2', x(interval[i-1]) ).attr('y2', 10).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, ${heightD})` );
+
+
+    //add additional ticks for y scale
+    //the minor ticks
+    for (i=1; i < interval.length; i += 1) {
+      minortick = (interval[i] - interval[i-1]) / 10;
+      for (let ticks = 1; ticks <= 10; ticks += 1) {
+        minortickmark = interval[i-1] + (minortick * ticks);
+        if (minortickmark > -3 && minortickmark < 3) svgD.append('line').attr('class', 'yaxis').attr('x1', x(-3)).attr('y1', y(minortickmark)).attr('x2', x(-3)-5 ).attr('y2', y(minortickmark)).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, 0)` );
+      }
+    }
+
+    //make larger middle tick
+    for (i = 1; i < interval.length; i += 1) {
+      svgD.append('line').attr('class', 'yaxis').attr('x1', x(-3) - 10 ).attr('y1', y(interval[i-1]) ).attr('x2', x(-3) ).attr('y2', y(interval[i-1])).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, 0)` );
+      middle = (interval[i] + interval[i-1]) / 2;
+      svgD.append('line').attr('class', 'yaxis').attr('x1', x(-3) - 10 ).attr('y1', y(middle) ).attr('x2', x(-3) ).attr('y2', y(middle)).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, 0)` );
+    }
+    svgD.append('line').attr('class', 'yaxis').attr('x1', x(-3) - 10 ).attr('y1', y(interval[i-1]) ).attr('x2', x(-3) ).attr('y2', y(interval[i-1]) ).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, 0)` );
+
+
+        
+    //add a test point or two
+    svgD.append('line').attr('class', 'test').attr('x1', x(-3)).attr('y1', y(-3)).attr('x2', x(3)).attr('y2', y(3)).attr('stroke', 'black').attr('stroke-width', 2);
+
   }
 
   function redrawDisplay() {
@@ -495,6 +588,21 @@ $corrlineslope.on('change', function() {
   function lg(s) {
     console.log(s);
   }  
+
+
+  //keep display at top when scrolling
+  function boxtothetop() {
+    let windowTop = $(window).scrollTop();
+    let top = $('#boxHere').offset().top;
+    if (windowTop > top) {
+      $('#display').addClass('box');
+      $('#boxHere').height($('#display').outerHeight());
+    } else {
+      $('#display').removeClass('box');
+      $('#boxHere').height(0);
+    }
+  }
+
 
 })
 
