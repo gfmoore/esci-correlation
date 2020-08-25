@@ -63,11 +63,6 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 
 /*----------------------------------Override left panel--------------------------------------------*/
 
-#leftpanel {
-  border: 2px solid black;
-  font-size: 1.6rem;
-}
-
 #header {
   border: 0px solid black;
 }
@@ -75,32 +70,6 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 #breadcrumbs {
   border: 1px solid black;
   font-size: 1.6rem;
-}
-
-/*----------------tab-----------------*/
-
-#smarttab {
-  margin-top: 2px;
-  margin-left: 2px;
-  margin-right: 2px;
-}
-
-/*override*/
-.st-theme-round > .tab-content > .tab-pane {
-  padding-left: 2px;
-  padding-right: 2px;
-}
-
-/*---------------tab headers----------------------------------------------------------*/
-
-.nav-link {
-  font-size: 1.6rem !important;
-}
-
-/*----------------------------------same r tab----------------------------------------------------*/
-
-#tab-1 {
-  font-size: 1.5rem !important;
 }
 
 #tab1text {
@@ -234,74 +203,6 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 #displaylines1{
   margin-top: 1rem;
   margin-bottom: 1rem;
-}
-
-
-/*--------------------------------------Dance r tab------------------------------------------------------*/
-
-#tab-2 {
-  font-size: 1.5rem !important;
-}
-
-#tab2text {
-  border: 1px solid black;
-  font-size: 1.5rem;
-  padding-left: 0.5rem;;
-  padding-top: 0.3rem;
-  padding-bottom: 0.3rem;
-}
-
-/*--------------Tab 2 Panel 1 N-----------------------*/
-#N2panel {
-  border: 1px solid black;
-  background-color: #FFFF99;
-  padding: 0.5rem;
-}
-
-#N2sliderpanel {
-  display: grid;
-  grid-template-columns: 25rem 2rem 3rem 5rem;
-  grid-row-gap: 3rem;
-  margin-top: 1rem;
-}
-
-#N2val {
-  margin-top: 3.0rem;
-  height: 2rem;
-  width: 4rem;
-}
-
-/*--------------Tab 2 Panel 2 rho-----------------------*/
-#rhopanel {
-  border: 1px solid black;
-  background-color: #FFCC99;
-  padding: 0.5rem;
-}
-
-#rhosliderpanel {
-  display: grid;
-  grid-template-columns: 25rem 2rem 3rem 5rem;
-  grid-row-gap: 3rem;
-  margin-top: 1rem;
-}
-
-#rhoval {
-  margin-top: 3.0rem;
-  height: 2rem;
-  width: 4rem;
-}
-
-#calculatedrhodiv {
-  margin-left: 0.5rem;
-  margin-bottom: 1.0rem;
-}
-
-#cionrhodiv {
-  margin: 0.5rem;
-}
-
-#cionrhoinfo {
-  margin: 0.5rem;
 }
 
 

@@ -28,10 +28,9 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
     <!--clear favicon cache-->
     <link rel="shortcut icon" href="./favicon.ico?v=2">  
 
-    <title>esci-d-pictues</title>
+    <title>esci-correlation</title>
 
     <!-- stylesheets -->
-    <link href=./css/smart_tab_esci.css rel=stylesheet type=text/css> 
 
     <link href=./css/ion.rangeSlider.css rel=stylesheet type=text/css>
 
@@ -48,9 +47,6 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 
     <script src=./js/d3.min.js></script>
 
-    <script src=./js/jquery.smartTab.min.js></script>
-    <script src=./js/jquery.smartTab.js></script>
-
     <script src=./js/ion.rangeSlider.min.js></script>
 
     <script src=./js/tipped.min.js></script>
@@ -62,9 +58,9 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
   <body>
 
     <div id=main>
-    <!----------------------------------Main heading---------------------------------->
-
+    <!----------------------------------Left Panel---------------------------------->
       <div id=leftpanel>
+        
         <div id=header>
           <div id=logo><img id=logoimg src=./images/logo.png></div>
           <div id=mainheading class=headingtip data-tooltip>esci web</div>
@@ -73,144 +69,87 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
         </div>
         <div id=breadcrumbs><span id=homecrumb class=hometip data-tooltip>Home></span><span id=distributioncrumb> correlation</span></div>
 
-        <!---------------------------------Set up tabs------------------------------------------------->
-        <div id="smarttab">
+        <div id=panels>  
 
-          <ul class="nav">
-            <li>
-              <a class="nav-link" href="#tab-1">correlation</a>
-            </li>
-            <li>
-              <a class="nav-link" href="#tab-2">x</a>
-            </li>
-          </ul>
-       
-          <div class="tab-content">  
-            
-            <!------------------------------------Same r tab----------------------------------------->                
-            <div id="tab-1" class="tab-pane" role="tabpanel">
-            
-              <div id=tab1text>
-                …:See data sets all with the same r
-              </div>
-              <!-------------------------------------Tab 1 Panels------------------------------------->        
+          <div id=tab1text>
+            …:See data sets all with the same r
+          </div>
+          <!-------------------------------------Tab 1 Panels------------------------------------->        
 
-              <!-----------Tab 1 Panel 1 N------------------------------------------->
-              <div id=N1panel>
-                <div><span class=red>1 </span><em>N</em></div>
-                <div id=N1sliderpanel>
-                  <div id=N1sliderdiv><input id=N1slider type=text/></div>
-                  <div><img id=N1nudgebackward class="icons slidericons" src=./images/left.png alt='nudge backwards'></div>
-                  <div><img id=N1nudgeforward class="icons slidericons" src=./images/right.png alt='nudge forward'></div>
-                  <input id=N1val type=text>
-                </div>
-
-              </div>
-
-              <!------------Panel 2 Generate dataset with chosen r------------->
-              <div id=rpanel>
-                <div><span class=red>2 </span><!--<input id=chosenr type=radio name=getdata checked=checked>--> Data set correlation <em>r</em></div>
-                <div id=rsliderpanel>
-                  <div id=rsliderdiv><input id=rslider type=text/></div>
-                  <div><img id=rnudgebackward class="icons slidericons" src=./images/left.png alt='nudge backwards'></div>
-                  <div><img id=rnudgeforward class="icons slidericons" src=./images/right.png alt='nudge forward'></div>
-                  <input id=rval type=text>
-                </div>
-                <div id=calculatedrdiv><em>r</em> of dataset <span id=calculatedr>0.5</span></div>
-
-              </div>
-
-
-              <!------------Panel 3 New data set------------->
-              <div id=newdatasetpanel>
-                <div><span class=red>3 </span></div>
-                <div id=newdataset>New Data Set</div>
-                <div>... with correlation <em>r</em></div>
-              </div>
-
-              <!------------Panel 4 Display features------------->
-              <div id=displayfeaturespanel>
-                <div><span class=red>4</span> Click to display</div>
-                <div><input id=displayr   type=checkbox> Value of <em>r</em> in the figure</div>
-                <div><input id=displayctm type=checkbox> Cross through means</div>
-                <div><input id=displaymd  type=checkbox> Marginal distributions</div>
-
-              </div>
-
-
-              <!------------Panel 5 Descriptive statistics------------->
-              <div id=displaystatistics1spanel>
-                <div><span class=red>5</span> Descriptive statistics <input id=statistics1show type=checkbox></div>
-
-                <div id=statistics1>
-                  <div></div>
-                  <div><em>X</em></div>
-                  <div><em>Y</em></div>
-
-                  <div>Mean</div>
-                  <div>0</div>
-                  <div>0</div>
-                  
-                  <div>SD</div>
-                  <div>0</div>
-                  <div>0</div>
-                  
-                </div>
-
-              </div>
-
-              <!------------Panel 6 Display Lines------------->
-              <div id=displaylines1panel>
-                <div><span class=red>5</span> Display lines <input id=displaylines1show type=checkbox></div>
-                
-                <div id=displaylines1>
-                  <div><input id=corryx type=checkbox> Y against X Slope <span id=corryxval>0.0</span></div>
-                  <div><input id=corrxy type=checkbox> X against Y Slope <span id=corrxyval>0.0</span></div>
-                  <div><input id=corrlineslope type=checkbox> Correlation line Slope <span id=corrlineslopeval>0.0</span></div>
-                </div>
-              </div> 
-
+          <!-----------Tab 1 Panel 1 N------------------------------------------->
+          <div id=N1panel>
+            <div><span class=red>1 </span><em>N</em></div>
+            <div id=N1sliderpanel>
+              <div id=N1sliderdiv><input id=N1slider type=text/></div>
+              <div><img id=N1nudgebackward class="icons slidericons" src=./images/left.png alt='nudge backwards'></div>
+              <div><img id=N1nudgeforward class="icons slidericons" src=./images/right.png alt='nudge forward'></div>
+              <input id=N1val type=text>
             </div>
 
-            <!-------------------------------------Dance r tab----------------------------------------->                
-            <div id="tab-2" class="tab-pane" role="tabpane1">
+          </div>
 
-              <div id=tab2text>
-                Sample from population with correlation r
-              </div>
+          <!------------Panel 2 Generate dataset with chosen r------------->
+          <div id=rpanel>
+            <div><span class=red>2 </span><!--<input id=chosenr type=radio name=getdata checked=checked>--> Data set correlation <em>r</em></div>
+            <div id=rsliderpanel>
+              <div id=rsliderdiv><input id=rslider type=text/></div>
+              <div><img id=rnudgebackward class="icons slidericons" src=./images/left.png alt='nudge backwards'></div>
+              <div><img id=rnudgeforward class="icons slidericons" src=./images/right.png alt='nudge forward'></div>
+              <input id=rval type=text>
+            </div>
+            <div id=calculatedrdiv><em>r</em> of dataset <span id=calculatedr>0.5</span></div>
 
-              <!-------------------------------------Tab 2 Panels------------------------------------->        
-                
-              <!-----------Tab 2 Panel 1 N------------------------------------------->
-              <div id=N2panel>
-                <div><span class=red>1 </span><em>N</em></div>
-                <div id=N2sliderpanel>
-                  <div id=N2sliderdiv><input id=N2slider type=text/></div>
-                  <div><img id=N2nudgebackward class="icons slidericons" src=./images/left.png alt='nudge backwards'></div>
-                  <div><img id=N2nudgeforward class="icons slidericons" src=./images/right.png alt='nudge forward'></div>
-                  <input id=N2val type=text>
-                </div>
+          </div>
 
-              </div>
 
-              <!------------Tab 2 Panel 2 Sample from population------------->
-              <div id=rhopanel>
-                <div><span class=red>2 </span><!--<input id=chosenrho type=radio name=getdata>--> Sample from population</div>
-                <div id=populationrhodiv>Population correlation <em>&rho;</em></div>
-                <div id=rhosliderpanel>
-                  <div id=rhosliderdiv><input id=rhoslider type=text/></div>
-                  <div><img id=rhonudgebackward class="icons slidericons" src=./images/left.png alt='nudge backwards'></div>
-                  <div><img id=rhonudgeforward class="icons slidericons" src=./images/right.png alt='nudge forward'></div>
-                  <input id=rhoval type=text>
-                </div>
-                <div id=calculatedrhodiv><em>r</em> of dataset <span id=calculatedrho>0.5</span></div>
-                <div id=cionrhodiv>95% CI on <em>r</em> [<span id=cirhofrom class=backcolour>0.0</span>, <span id=cirhoto class=backcolour>0.0</span>]</div>
-                <div id=cionrhoinfo class=small1>Data set is a random sample from the population</div>
-              </div>
+          <!------------Panel 3 New data set------------->
+          <div id=newdatasetpanel>
+            <div><span class=red>3 </span></div>
+            <div id=newdataset>New Data Set</div>
+            <div>... with correlation <em>r</em></div>
+          </div>
 
+          <!------------Panel 4 Display features------------->
+          <div id=displayfeaturespanel>
+            <div><span class=red>4</span> Click to display</div>
+            <div><input id=displayr   type=checkbox> Value of <em>r</em> in the figure</div>
+            <div><input id=displayctm type=checkbox> Cross through means</div>
+            <div><input id=displaymd  type=checkbox> Marginal distributions</div>
+
+          </div>
+
+
+          <!------------Panel 5 Descriptive statistics------------->
+          <div id=displaystatistics1spanel>
+            <div><span class=red>5</span> Descriptive statistics <input id=statistics1show type=checkbox></div>
+
+            <div id=statistics1>
+              <div></div>
+              <div><em>X</em></div>
+              <div><em>Y</em></div>
+
+              <div>Mean</div>
+              <div>0</div>
+              <div>0</div>
+              
+              <div>SD</div>
+              <div>0</div>
+              <div>0</div>
             </div>
 
-          </div>    
+          </div>
+
+          <!------------Panel 6 Display Lines------------->
+          <div id=displaylines1panel>
+            <div><span class=red>6</span> Display lines <input id=displaylines1show type=checkbox></div>
+            
+            <div id=displaylines1>
+              <div><input id=corryx type=checkbox> Y against X Slope <span id=corryxval>0.0</span></div>
+              <div><input id=corrxy type=checkbox> X against Y Slope <span id=corrxyval>0.0</span></div>
+              <div><input id=corrlineslope type=checkbox> Correlation line Slope <span id=corrlineslopeval>0.0</span></div>
+            </div>
+          </div> 
+
         </div>
 
         <!---------------------------------Footer---------------------------------------------->
