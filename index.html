@@ -8,6 +8,7 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 <!-- #region version history-->
 <!--
 0.0.1   Initial version
+0.0.2 2020-08-26 #2 Appearance jigs
 
 -->
 <!--endregion -->
@@ -72,7 +73,7 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
         <div id=panels>  
 
           <div id=tab1text>
-            …:See data sets all with the same r
+            See data sets all with the same <em>r</em>
           </div>
           <!-------------------------------------Tab 1 Panels------------------------------------->        
 
@@ -97,7 +98,7 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
               <div><img id=rnudgeforward class="icons slidericons" src=./images/right.png alt='nudge forward'></div>
               <input id=rval type=text>
             </div>
-            <div id=calculatedrdiv><em>r</em> of dataset <span id=calculatedr>0.5</span></div>
+            <div id=calculatedrdiv><em>r</em> of dataset <span id=calculatedr class=red>0.5</span></div>
 
           </div>
 
@@ -128,13 +129,13 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
               <div><em>X</em></div>
               <div><em>Y</em></div>
 
-              <div>Mean</div>
-              <div>0</div>
-              <div>0</div>
+              <div class=statslabel>Mean</div>
+              <div class=red>0</div>
+              <div class=red>0</div>
               
-              <div>SD</div>
-              <div>0</div>
-              <div>0</div>
+              <div class=statslabel>SD</div>
+              <div class=red>0</div>
+              <div class=red>0</div>
             </div>
 
           </div>
@@ -144,9 +145,9 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
             <div><span class=red>6</span> Display lines <input id=displaylines1show type=checkbox></div>
             
             <div id=displaylines1>
-              <div><input id=corryx type=checkbox> Y against X Slope <span id=corryxval>0.0</span></div>
-              <div><input id=corrxy type=checkbox> X against Y Slope <span id=corrxyval>0.0</span></div>
-              <div><input id=corrlineslope type=checkbox> Correlation line Slope <span id=corrlineslopeval>0.0</span></div>
+              <div><input id=corryx type=checkbox> <em>Y</em> against <em>X</em> <span id=corryxvallabel >Slope</span>       <span id=corryxval class=red>0.0</span></div>
+              <div><input id=corrxy type=checkbox> <em>X</em> against <em>Y</em> <span id=corrxyvallabel>Slope</span>        <span id=corrxyval class=red>0.0</span></div>
+              <div><input id=corrlineslope type=checkbox> Correlation line       <span id=corrlineslopevallabel>Slope</span> <span id=corrlineslopeval class=red>0.0</span></div>
             </div>
           </div> 
 

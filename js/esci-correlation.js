@@ -526,7 +526,7 @@ $corrlineslope.on('change', function() {
   function rnudgeforward() {
     r += 0.01;
     if (r > 1) r = 1;
-    $rval.val(r.toFixed(1).toString().replace('0.', '.'));
+    $rval.val(r.toFixed(2).toString().replace('0.', '.'));
     $calculatedr.text(r.toFixed(2).toString().replace('0.', '.'));
     updater();
   }

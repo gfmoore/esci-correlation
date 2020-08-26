@@ -129,6 +129,7 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 
 #calculatedrdiv {
   margin: 0.5rem;
+  padding-left: 20.5rem;
 }
 
 
@@ -191,10 +192,14 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 #statistics1 {
   margin-top: 1rem;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 10rem 5rem 10rem;
   margin-bottom: 1rem;
 }
 
+.statslabel {
+  text-align: right;
+  padding-right: 3.0rem;
+}
 
 /*--------------Tab 1 Panel 6 Display lines-----------------------*/
 #displaylines1panel {
@@ -209,6 +214,17 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
   margin-bottom: 1rem;
 }
 
+#corryxvallabel {
+  padding-left: 4.0rem;
+}
+
+#corrxyvallabel {
+  padding-left: 4.0rem;
+}
+
+#corrlineslopevallabel {
+  padding-left: 1.0rem;
+}
 
 /*----------------------------------Right panel-----------------------------------------*/
 #rightpanel {
