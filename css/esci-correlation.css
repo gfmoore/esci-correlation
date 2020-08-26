@@ -9,6 +9,8 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 /* #region Version history
 
 0.0.1   Initial version
+0.0.2 2020-08-26 #2 Appearance jigs
+0.0.3 2020-08-26 #1 Basic correlation. Not all flags implemented yet.
 
 
 #endregion */
@@ -152,6 +154,7 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
   margin-top: -1rem;
   margin-bottom: 0.5rem;
   margin-left: 2rem;
+  user-select: none;
 }
 
 #newdataset:hover {
@@ -231,6 +234,7 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
   border: 1px solid grey;
   display: grid;
   grid-template-rows: auto;
+  padding-top: 1rem;
 }
 
 /*----------------------------------footer override---------------------------------*/
@@ -243,7 +247,7 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 
 #display {
   background-color: white;
-  border: 2px solid red;
+  margin-left: 2rem;
   position: sticky; /*keeps div at top when vertical scrolling*/
   top: 0;
 }
