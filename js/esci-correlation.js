@@ -609,6 +609,7 @@ $(function() {
     if (tooltipson) {
       tooltipson = false;
       $('#tooltipsonoff').css('background-color', 'lightgrey');
+	  Tipped.disable('[data-tooltip]');
     }
     else {
       tooltipson = true;
