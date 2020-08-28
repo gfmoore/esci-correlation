@@ -10,7 +10,7 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 0.0.1   Initial version
 0.0.2 2020-08-26 #2 Appearance jigs
 0.0.3 2020-08-26 #1 Basic correlation. Not all flags implemented yet.
-
+0.0.4
 -->
 <!--endregion -->
 
@@ -127,16 +127,16 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 
             <div id=statistics1>
               <div></div>
-              <div><em>X</em></div>
-              <div><em>Y</em></div>
+              <div id=labelx><em>X</em></div>
+              <div id=labely><em>Y</em></div>
 
               <div class=statslabel>Mean</div>
-              <div class=red>0</div>
-              <div class=red>0</div>
+              <div id=m1 class='red pushright'>0</div>
+              <div id=m2 class='red pushright'>0</div>
               
               <div class=statslabel>SD</div>
-              <div class=red>0</div>
-              <div class=red>0</div>
+              <div id=s1 class='red pushright'>0</div>
+              <div id=s2 class='red pushright'>0</div>
             </div>
 
           </div>
@@ -149,6 +149,9 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
               <div><input id=corryx type=checkbox> <em>Y</em> against <em>X</em> <span id=corryxvallabel >Slope</span>       <span id=corryxval class=red>0.0</span></div>
               <div><input id=corrxy type=checkbox> <em>X</em> against <em>Y</em> <span id=corrxyvallabel>Slope</span>        <span id=corrxyval class=red>0.0</span></div>
               <div><input id=corrlineslope type=checkbox> Correlation line       <span id=corrlineslopevallabel>Slope</span> <span id=corrlineslopeval class=red>0.0</span></div>
+
+              <div id=confidenceellipsediv><input id=confidenceellipse type=checkbox> Confidence ellipse </div>
+
             </div>
           </div> 
 

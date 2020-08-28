@@ -1,6 +1,6 @@
 # esci-correlation
 
-## Current version 0.0.3
+## Current version 0.0.4
 
 You can see which version by hovering on the logo.
 

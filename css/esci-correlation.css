@@ -11,7 +11,7 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 0.0.1   Initial version
 0.0.2 2020-08-26 #2 Appearance jigs
 0.0.3 2020-08-26 #1 Basic correlation. Not all flags implemented yet.
-
+0.0.4
 
 #endregion */
 
@@ -195,13 +195,25 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 #statistics1 {
   margin-top: 1rem;
   display: grid;
-  grid-template-columns: 10rem 5rem 10rem;
+  grid-template-columns: 10rem 3rem 6rem;
   margin-bottom: 1rem;
 }
 
 .statslabel {
   text-align: right;
   padding-right: 3.0rem;
+}
+
+#labelx {
+  margin-left: 1.5rem; 
+}
+
+#labely {
+  margin-left: 3.8rem;
+}
+
+.pushright {
+  text-align: right;
 }
 
 /*--------------Tab 1 Panel 6 Display lines-----------------------*/
