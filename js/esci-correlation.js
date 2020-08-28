@@ -12,6 +12,7 @@ Licence       GNU General Public Licence Version 3, 29 June 2007
 0.0.2 2020-08-26 #2 Appearance jigs
 0.0.3 2020-08-26 #1 Basic correlation. Not all flags implemented yet.
 0.0.4 2020-08-28 #1 Mostly implemented, waitimg for inevitable tweaks :)
+0.0.5 2020-08-28 #1 Fixed display of r bug
 
 */
 //#endregion 
@@ -415,12 +416,6 @@ $(function() {
       else  /*normal*/              svgD.append('circle').attr('class', 'scatters').attr('cx', x(scatters[i].x)).attr('cy', y(scatters[i].y)).attr('r', '3').attr('stroke', 'blue').attr('stroke-width', 2).attr('fill', 'blue');
     }
 
-    //display r on graph
-    if(displayr) { 
-      svgD.append('text').text('r = ').attr('class', 'rtext').attr('x', 150).attr('y', y(2.8)).attr('text-anchor', 'start').attr('fill', 'black').style('font-size', '2.0rem').style('font-weight', 'bold').style('font-style', 'italic');
-      svgD.append('text').text(sample_r.toFixed(2).toString().replace('0.', '.')).attr('class', 'rtext').attr('x', 200).attr('y', y(2.8)).attr('text-anchor', 'start').attr('fill', 'black').style('font-size', '2.0rem').style('font-weight', 'bold');
-    }
-
     if (displaymd) {
       for (i = 0; i < scatters.length; i += 1) {
         if      (scatters[i].y < -3) svgD.append('circle').attr('class', 'scatters').attr('cx', x(-2.95)).attr('cy', y(-3.05)).attr('r', '3').attr('stroke', 'black').attr('stroke-width', 1).attr('fill', 'black');
@@ -453,9 +448,15 @@ $(function() {
     $s1.text(xsd.toFixed(2).toString());
     $s2.text(ysd.toFixed(2).toString());
 
+    //get r
     sample_r = jStat.corrcoeff( xvals, yvals )
-
     $calculatedr.text(sample_r.toFixed(2).toString().replace('0.', '.'))
+
+    //display r on graph
+    if(displayr) { 
+      svgD.append('text').text('r = ').attr('class', 'rtext').attr('x', 150).attr('y', y(2.8)).attr('text-anchor', 'start').attr('fill', 'black').style('font-size', '2.0rem').style('font-weight', 'bold').style('font-style', 'italic');
+      svgD.append('text').text(sample_r.toFixed(2).toString().replace('0.', '.')).attr('class', 'rtext').attr('x', 200).attr('y', y(2.8)).attr('text-anchor', 'start').attr('fill', 'black').style('font-size', '2.0rem').style('font-weight', 'bold');
+    }
 
     let sxx = 0;
     let syy = 0;
