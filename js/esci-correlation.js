@@ -132,6 +132,7 @@ $(function() {
   const $s1 = $('#s1');
   const $s2 = $('#s2');
 
+  let test = false;
 
   //#endregion
 
@@ -302,13 +303,16 @@ $(function() {
 
     //d3.selectAll('.test').remove();
 
+    // x = d3.scaleLinear().domain([-3, 3]).range([margin.left+20, widthD-margin.left]);
+    // y = d3.scaleLinear().domain([-3, 3]).range([heightD-50, 20]);
+
     x = d3.scaleLinear().domain([-3, 3]).range([margin.left+20, widthD-margin.left]);
-    y = d3.scaleLinear().domain([-3, 3]).range([heightD-50, 20]);
-    
+    y = d3.scaleLinear().domain([-3, 3]).range([heightD-70, 50]);
+
     //or? widthD   = rwidth - margin.left - margin.right; 
 
     let xAxis = d3.axisBottom(x).tickPadding([10]).ticks(7).tickFormat(d3.format('')); //.ticks(20); //.tickValues([]);
-    svgD.append('g').attr('class', 'xaxis').style("font", "1.5rem sans-serif").style('padding-top', '0.5rem').attr( 'transform', `translate(0, ${heightD-50})` ).call(xAxis);
+    svgD.append('g').attr('class', 'xaxis').style("font", "1.5rem sans-serif").style('padding-top', '0.5rem').attr( 'transform', `translate(0, ${heightD-70})` ).call(xAxis);
 
     let yAxis = d3.axisLeft(y).tickPadding([10]).ticks(7).tickFormat(d3.format('')); //.ticks(20); //.tickValues([]);
     svgD.append('g').attr('class', 'yaxis').style("font", "1.5rem sans-serif").attr( 'transform', `translate(${margin.left+20}, 0)` ).call(yAxis);
@@ -331,72 +335,45 @@ $(function() {
       for (let ticks = 1; ticks <= 10; ticks += 1) {
         minortickmark = interval[i-1] + (minortick * ticks);
         if (minortickmark > -3 && minortickmark < 3) svgD.append('line').attr('class', 'xaxis').attr('x1', x(minortickmark)).attr('y1', 0).attr('x2', x(minortickmark) ).attr('y2', 10).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, ${heightD})` );
+        if (minortickmark > -3 && minortickmark < 3) svgD.append('line').attr('class', 'yaxis').attr('x1', 0).attr('y1', y(minortickmark)).attr('x2', 10 ).attr('y2', y(minortickmark)).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, ${heightD})` );
+
       }
     }
-
 
     // for (i=1; i < interval.length; i += 1) {
     //   minortick = (interval[i] - interval[i-1]) / 10;
     //   for (let ticks = 1; ticks <= 10; ticks += 1) {
     //     minortickmark = interval[i-1] + (minortick * ticks);
-    //     if (minortickmark > -3 && minortickmark < 3) svgD.append('line').attr('class', 'xaxis').attr('x1', x(minortickmark)).attr('y1', 0).attr('x2', x(minortickmark) ).attr('y2', 5).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, ${heightD})` );
+    //     if (minortickmark > -3 && minortickmark < 3) {
+            //  svgD.append('line').attr('class', 'xaxis').attr('x1', x(minortickmark)).attr('y1', 0).attr('x2', x(minortickmark) ).attr('y2', 5).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, ${heightD})` );
+            //  svgD.append('line').attr('class', 'yaxis').attr('x1', 0).attr('y1', y(minortickmark)).attr('x2', 5 ).attr('y2', y(minortickmark)).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, ${heightD})` );
+        //  }
     //   }
     // }
-
-    // //make larger middle tick
-    // for (i = 1; i < interval.length; i += 1) {
-    //   svgD.append('line').attr('class', 'xaxis').attr('x1', x(interval[i-1])).attr('y1', 0).attr('x2', x(interval[i-1]) ).attr('y2', 10).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, ${heightD})` );
-    //   middle = (interval[i] + interval[i-1]) / 2;
-    //   svgD.append('line').attr('class', 'xaxis').attr('x1', x(middle)).attr('y1', 0).attr('x2', x(middle) ).attr('y2', 10).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, ${heightD})` );
-    // }
-    // svgD.append('line').attr('class', 'xaxis').attr('x1', x(interval[i-1])).attr('y1', 0).attr('x2', x(interval[i-1]) ).attr('y2', 10).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, ${heightD})` );
-
-
-    //add additional ticks for y scale
-    //the minor ticks
-    for (i=1; i < interval.length; i += 1) {
-      minortick = (interval[i] - interval[i-1]);
-      for (let ticks = 1; ticks <= 10; ticks += 1) {
-        minortickmark = interval[i-1] + (minortick * ticks);
-        if (minortickmark > -3 && minortickmark < 3) svgD.append('line').attr('class', 'yaxis').attr('x1', x(-3)).attr('y1', y(minortickmark)).attr('x2', x(-3)-10 ).attr('y2', y(minortickmark)).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, 0)` );
-      }
-    }
-
-
-    //the minor ticks
-    // for (i=1; i < interval.length; i += 1) {
-    //   minortick = (interval[i] - interval[i-1]) / 10;
-    //   for (let ticks = 1; ticks <= 10; ticks += 1) {
-    //     minortickmark = interval[i-1] + (minortick * ticks);
-    //     if (minortickmark > -3 && minortickmark < 3) svgD.append('line').attr('class', 'yaxis').attr('x1', x(-3)).attr('y1', y(minortickmark)).attr('x2', x(-3)-5 ).attr('y2', y(minortickmark)).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, 0)` );
-    //   }
-    // }
-
-    //make larger middle tick
-    // for (i = 1; i < interval.length; i += 1) {
-    //   svgD.append('line').attr('class', 'yaxis').attr('x1', x(-3) - 10 ).attr('y1', y(interval[i-1]) ).attr('x2', x(-3) ).attr('y2', y(interval[i-1])).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, 0)` );
-    //   middle = (interval[i] + interval[i-1]) / 2;
-    //   svgD.append('line').attr('class', 'yaxis').attr('x1', x(-3) - 10 ).attr('y1', y(middle) ).attr('x2', x(-3) ).attr('y2', y(middle)).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, 0)` );
-    // }
-    // svgD.append('line').attr('class', 'yaxis').attr('x1', x(-3) - 10 ).attr('y1', y(interval[i-1]) ).attr('x2', x(-3) ).attr('y2', y(interval[i-1]) ).attr('stroke', 'black').attr('stroke-width', 1).attr( 'transform', `translate(0, 0)` );
-
-
-        
-    //add a test point or two
-    //svgD.append('line').attr('class', 'test').attr('x1', x(-3)).attr('y1', y(-3)).attr('x2', x(3)).attr('y2', y(3)).attr('stroke', 'black').attr('stroke-width', 2);
-
   }
 
+  $('#test').on('change', function() {
+    test = $('#test').is(':checked');
+    createScatters();
+    drawScatterGraph();
+  })
+
   function createScatters() {
-    scatters = [];
 
-    for (i = 0; i < N1; i += 1) {
-      xs = jStat.normal.sample( 0, 1 );
-      ys = jStat.normal.sample( 0, 1 );
+    if (test) {
+    scatters= [{x: -1, y: -1}, {x: -0.5, y: -0.5}, {x: -0.3, y: 0.3}, {x: 0.3, y: -0.3}, {x: 0.5, y: 0.5}, {x: 1, y: 1}]
+    }
+    else {
+      scatters = [];
 
-      ys = (r * xs) + (Math.sqrt(1 - r*r) * ys);          
+      for (i = 0; i < N1; i += 1) {
+        xs = jStat.normal.sample( 0, 1 );
+        ys = jStat.normal.sample( 0, 1 );
 
-      scatters.push({ x: xs, y: ys });
+        ys = (r * xs) + (Math.sqrt(1 - r*r) * ys);          
+
+        scatters.push({ x: xs, y: ys });
+      }
     }
   }
 
@@ -468,20 +445,32 @@ $(function() {
       syy += (scatters[i].y - ymean) * (scatters[i].y - ymean);
     }
 
+    //y on x
     let betayonx = sxy/sxx;
     let alphayonx = ymean - betayonx * xmean;
     let yvalueyxA = alphayonx + betayonx * -3;
     let yvalueyxB = alphayonx + betayonx * 3
 
+    // let betaxony = sxy/syy;
+    // let alphaxony = ymean - betaxony * xmean;;
+    // let yvaluexyA = alphaxony + betaxony * -3;
+    // let yvaluexyB = alphaxony + betaxony * 3
+
+    //x on y
     let betaxony = sxy/syy;
-    let alphaxony = ymean - betaxony * xmean;;
-    let yvaluexyA = alphaxony + betaxony * -3;
-    let yvaluexyB = alphaxony + betaxony * 3
+    let alphaxony = xmean - betaxony * ymean;;
+    let xvaluexyA = alphaxony + betaxony * -3;
+    let xvaluexyB = alphaxony + betaxony * 3
+
+    //get the gradient as from normal perspective from these
+    let betaxonyslope = (3 - -3)/(xvaluexyB - xvaluexyA);
+
 
     $corryxval.text((betayonx).toFixed(2).toString().replace('0.', '.'));
-    $corrxyval.text((betaxony).toFixed(2).toString().replace('0.', '.'));
+    $corrxyval.text((betaxonyslope).toFixed(2).toString().replace('0.', '.'));
 
-    let betasdslope = (betayonx + betaxony) /2;
+    let betasdslope = (betayonx + betaxonyslope) /2;
+
     $corrlineslopeval.text((betasdslope).toFixed(2).toString().replace('0.', '.'));    
 
     let sdlinec     = ymean - betasdslope * xmean; 
@@ -500,20 +489,28 @@ $(function() {
       svgD.append('line').attr('class', 'ctm').attr('x1', x(-3)).attr('y1', y(ymean)).attr('x2', x(3)).attr('y2', y(ymean)).attr('stroke', 'black').attr('stroke-width', 1).style('stroke-dasharray', ('3, 3'));
     }
 
+    //corryx = true;
     if (corryx) {
       svgD.append('line').attr('class', 'regression').attr('x1', x(-3)).attr('y1', y(yvalueyxA)).attr('x2', x(3) ).attr('y2', y(yvalueyxB)).attr('stroke', 'blue').attr('stroke-width', 1).attr('clip-path', 'url(#mask)');
     }
 
+    //corrxy = true;
     if (corrxy) {
-      svgD.append('line').attr('class', 'regression').attr('x1', x(-3)).attr('y1', y(yvaluexyA)).attr('x2', x(3) ).attr('y2', y(yvaluexyB)).attr('stroke', 'red').attr('stroke-width', 1).attr('clip-path', 'url(#mask)');
+      svgD.append('line').attr('class', 'regression').attr('x1', x(xvaluexyA)).attr('y1', y(-3)).attr('x2', x(xvaluexyB) ).attr('y2', y(3)).attr('stroke', 'red').attr('stroke-width', 1).attr('clip-path', 'url(#mask)');
     }
 
+    //corrlineslope = true;
     if (corrlineslope) {
       svgD.append('line').attr('class', 'regression').attr('x1', x(-3)).attr('y1', y(ysdvalueA)).attr('x2', x(3) ).attr('y2', y(ysdvalueB)).attr('stroke', 'green').attr('stroke-width', 1).attr('clip-path', 'url(#mask)');
+
+      //svgD.append('line').attr('class', 'regression').attr('x1', x(-3)).attr('y1', y(-3)).attr('x2', x(3) ).attr('y2', y(3)).attr('stroke', 'green').attr('stroke-width', 1).attr('clip-path', 'url(#mask)');
+      //svgD.append('line').attr('class', 'regression').attr('x1', x(-3)).attr('y1', y(3)).attr('x2', x(3) ).attr('y2', y(-3)).attr('stroke', 'green').attr('stroke-width', 1).attr('clip-path', 'url(#mask)');
+
     }
 
     $('#confidenceellipsediv').hide();
     //confidenceellipse = true;
+
     if (confidenceellipse) {
      //https://www.visiondummy.com/2014/04/draw-error-ellipse-representing-covariance-matrix/
 
@@ -534,14 +531,25 @@ $(function() {
       semimajor = xsd * Math.sqrt(5.991 * lambda1) * widthD/6;  //90% = 4.605 ,95% = 5.991, 99% = 9.210
       semiminor = ysd * Math.sqrt(5.991 * lambda2) * heightD/6;
 
-      let angle = 0;
-      if (lambda1 > lambda2)  angle = 90-Math.atan(eigenvector1) * 180/Math.PI;
-      else                    angle = 90-Math.atan(eigenvector2) * 180/Math.PI;
+      let angle; // = 90; //horizontal!!
+      let angle1 = Math.atan(eigenvector1) * 180/Math.PI;
+      let angle2 = Math.atan(eigenvector2) * 180/Math.PI;
 
+      //if (lambda1 >= lambda2) angle = angle1; else angle = angle2; 
+
+      //alternatively just use angle of SD line
+      angle = Math.atan(betasdslope) * 180/Math.PI; // + 1.3;
+      //angle = Math.atan(1) * 180/Math.PI; // + 1.3;
 
       //covariance error ellipse
-      svgD.append('ellipse').attr('class', 'confidenceellipse').attr( 'cx', x(xmean)).attr('cy', y(ymean)).attr('rx', semimajor).attr('ry', semiminor).attr('transform', `rotate( ${angle}, ${x(xmean)}, ${y(ymean)} )`).attr('stroke', 'orange').attr('stroke-width', 3).attr('fill', 'none');
+      svgD.append('ellipse').attr('class', 'confidenceellipse').attr( 'cx', x(xmean)).attr('cy', y(ymean)).attr('rx', semimajor).attr('ry', semiminor).attr('transform', `rotate( ${(-90-angle)}, ${x(xmean)}, ${y(ymean)} )`).attr('stroke', 'orange').attr('stroke-width', 3).attr('fill', 'none').attr('clip-path', 'url(#mask)');
+
+      //svgD.append('line').attr('class', 'regression').attr('x1', x(xmean-3)).attr('y1', y(ymean)).attr('x2', x(xmean+3) ).attr('y2', y(ymean)).attr('transform', `rotate( ${-(angle2)}, ${x(xmean)}, ${y(ymean)} )`).attr('stroke', 'red').attr('stroke-width', 2).attr('clip-path', 'url(#mask)');
+
     }
+
+
+
   }
 
   function quadraticA(a, b, c) {
