@@ -10,7 +10,7 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 0.0.1   Initial version
 0.0.2 2020-08-26 #2 Appearance jigs
 0.0.3 2020-08-26 #1 Basic correlation. Not all flags implemented yet.
-0.0.5
+0.0.6
 -->
 <!--endregion -->
 
@@ -152,12 +152,40 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
               <div><input id=corrxy type=checkbox> <em>X</em> against <em>Y</em> <span id=corrxyvallabel>Slope</span>        <span id=corrxyval class=red>0.0</span></div>
               <div><input id=corrlineslope type=checkbox> Correlation line       <span id=corrlineslopevallabel>Slope</span> <span id=corrlineslopeval class=red>0.0</span></div>
 
-              <div id=confidenceellipsediv><input id=confidenceellipse type=checkbox>95% Confidence ellipse </div>
+              <div id=confidenceellipsediv><input id=confidenceellipse type=checkbox>90% Confidence ellipse </div>
 
             </div>
           </div> 
 
-        </div>
+
+          <!------------Panel x Display Information Panel------------->
+          <div id=displayinfopaneldiv>
+            <div id=displayinfopaneltitle>Covariance matrix</div>
+            <div id=covmatrixpanel>
+              <div>| <span id=covxx>0</span><span id=spacer> </span><span id=covxy>0</span> |</div>
+              <div>| <span id=covyx>0</span><span id=spacer> </span><span id=covyy>0</span> |</div>
+            </div>  
+
+            <div id=displayinfopaneltitle>Eigenvalues and eigenvectors</div>
+            <div id=displayinfopanel>
+              <div >&lambda;<sub>1 </sub><span id=lambda1>0</span></div> 
+              <div>
+                <div id=eignenvector1x>|<span id=x1>1.00</span>|</div>
+                <div id=eignenvector1y>|<span id=y1>0</span>|</div>  
+              </div>
+
+              <div id=space></div><div></div>
+
+              <div >&lambda;<sub>2 </sub><span id=lambda2>0</span></div> 
+              <div>
+                <div id=eignenvector2x>|<span id=x2>1.00</span>|</div>
+                <div id=eignenvector2y>|<span id=y2>0</span>|</div>  
+              </div>
+            </div>
+          </div>
+
+
+        </div> 
 
         <!---------------------------------Footer---------------------------------------------->
         <div id=footer>
@@ -167,13 +195,15 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
       </div>
 
 <!-------------------------------------Right panel---------------------------------------------->
-        
+ 
       <div id=rightpanel>     
         <div id=display></div>
       </div>
 
+
   <!------------------------------------------------------------------------------------->
     </div>
+
 
   </body>
 </html>

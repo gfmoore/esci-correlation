@@ -11,7 +11,7 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 0.0.1   Initial version
 0.0.2 2020-08-26 #2 Appearance jigs
 0.0.3 2020-08-26 #1 Basic correlation. Not all flags implemented yet.
-0.0.5
+0.0.6
 
 #endregion */
 
@@ -241,6 +241,43 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
   padding-left: 1.0rem;
 }
 
+/*--------------Tab 1 Panel 7 Information-----------------------*/
+#displayinfopaneldiv {
+  background-color: lightgrey;
+  padding-bottom: 1rem;
+  padding-left: 0.5rem;
+  border: 1px solid black;
+}
+
+#displayinfopaneltitle {
+  padding: 0.5rem;  
+}
+
+#displayinfopanel {
+
+  display: grid;
+  grid-template-columns: 10rem 10rem;
+}
+
+#lambda1 {
+  margin-top: 2rem;
+}
+
+#lambda2 {
+  margin-top: 2rem;
+}
+
+#space {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+#spacer {
+  margin-left: 2rem;
+  margin-right: rem;
+}
+
+
 /*----------------------------------Right panel-----------------------------------------*/
 #rightpanel {
   border: 1px solid grey;
@@ -263,5 +300,3 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
   position: sticky; /*keeps div at top when vertical scrolling*/
   top: 0;
 }
-
-
