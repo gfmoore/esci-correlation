@@ -14,11 +14,12 @@ Licence       GNU General Public Licence Version 3, 29 June 2007
 0.0.4 2020-08-28 #1 Mostly implemented, waitimg for inevitable tweaks :)
 0.0.5 2020-08-28 #1 Fixed display of r bug
 0.0.6 2020-08-30 #1 All sorts of fixes and checking.
+0.0.7 2020-08-31 #1 Fix bounding on correlation line
 
 */
 //#endregion 
 
-let version = '0.0.6';
+let version = '0.0.7';
 
 'use strict';
 $(function() {
@@ -237,15 +238,11 @@ $(function() {
   function updateN1() {
     if (!sliderinuse) $N1slider.update({ from: N1 })
     sliderinuse = false;
-    // createScatters();
-    // drawScatterGraph();
   }
 
   function updater() {
     if (!sliderinuse) $rslider.update({ from: rs })
     sliderinuse = false;
-    // createScatters();
-    // drawScatterGraph();
   }
 
 
@@ -361,21 +358,28 @@ $(function() {
 
   function createScatters() {
 
+    let xr, yr, z;
+
     //test=true;
     if (test) {
       scatters= [{x: -1, y: -1}, {x: -0.5, y: -0.5}, {x: -0.3, y: 0.3}, {x: 0.3, y: -0.3}, {x: 0.5, y: 0.5}, {x: 1, y: 1}]
     }
     else {
       scatters = [];
+      s = [];
 
       for (i = 0; i < N1; i += 1) {
         xs = jStat.normal.sample( 0, 1 );
         ys = jStat.normal.sample( 0, 1 );
-
-        ys = (rs * xs) + (Math.sqrt(1 - rs*rs) * ys);          
-
-        scatters.push({ x: xs, y: ys });
+        ys = (rs * xs) + (Math.sqrt(1 - rs*rs) * ys);
+        scatters.push({ x: xs, y: ys });        
+        s.push([xs, ys]);
       }
+
+      //math.js
+      s.forEach(function (value, index, matrix) {
+        console.log('value:', value, 'index:', index) 
+      }) 
     }
   }
 
@@ -484,10 +488,29 @@ $(function() {
 
     //covariance matrix - [cxx cxy]
     //                    [cyx cyy]    
-    let covxx = jStat.covariance(xvals, xvals);
+    let covxx = jStat.covariance(xvals, xvals);  //this is the xsd^2, that is the variance of x
     let covxy = jStat.covariance(xvals, yvals);
-    let covyx = jStat.covariance(yvals, xvals);
-    let covyy = jStat.covariance(yvals, yvals);
+    let covyx = jStat.covariance(yvals, xvals);  //same as covxy really
+    let covyy = jStat.covariance(yvals, yvals);  //ths is the ysd^2, that is the variance of x
+
+
+    
+    //create a math.matrix representation
+    //create Cholesky decomposition from covariance matrix
+    // let cov = math.matrix([[covxx, covxy], [covyx, covyy]]);
+    // print(cov); 
+    // cov = math.diag(cov);
+    // print(cov);
+    // cov = math.diag(cov);
+    // print(cov);
+    // cov = math.sqrt(cov);
+    // print(cov);
+    
+    
+    
+    // let eigs = math.eigs(cov)
+    // print(eigs);
+
 
     $('#covxx').text(covxx.toFixed(2));
     $('#covxy').text(covxy.toFixed(2));
@@ -539,7 +562,7 @@ $(function() {
 
     //corrlineslope = true;
     if (corrlineslope) {
-      svgD.append('line').attr('class', 'regression').attr('x1', x(-3) ).attr('y1', y(ycl1) ).attr('x2', x(3) ).attr('y2', y(ycl2) ).attr('stroke', 'black').attr('stroke-width', 1); //.attr('clip-path', 'url(#mask)');
+      svgD.append('line').attr('class', 'regression').attr('x1', x(-3) ).attr('y1', y(ycl1) ).attr('x2', x(3) ).attr('y2', y(ycl2) ).attr('stroke', 'black').attr('stroke-width', 1).attr('clip-path', 'url(#mask)');
     }
 
     if (confidenceellipse) {
@@ -861,6 +884,11 @@ $(function() {
   function lg(s) {
     console.log(s);
   }  
+
+  function print (value) {
+    const precision = 2
+    console.log(math.format(value, precision))
+  }
 
   //keep display at top when scrolling
   function boxtothetop() {
