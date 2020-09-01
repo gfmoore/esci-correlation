@@ -15,11 +15,12 @@ Licence       GNU General Public Licence Version 3, 29 June 2007
 0.0.5 2020-08-28 #1 Fixed display of r bug
 0.0.6 2020-08-30 #1 All sorts of fixes and checking.
 0.0.7 2020-08-31 #1 Fix bounding on correlation line
+0.0.8 2020-09-01 #6 First attempt at forcing correlation to match target correlation
 
 */
 //#endregion 
 
-let version = '0.0.7';
+let version = '0.0.8';
 
 'use strict';
 $(function() {
@@ -35,9 +36,6 @@ $(function() {
 
   let rwidth;                                                                 //the width returned by resize
   let rheight;                                                                //the height returned by resize
-  
-  let left;
-  let right;
 
   let pauseId;
   let repeatId;
@@ -62,6 +60,8 @@ $(function() {
 
   const $rval = $('#rval');
   $rval.val(r.toFixed(2).toString().replace('0.', '.'));
+
+  const $calculatedr = $('#calculatedr');
 
   const $rnudgebackward = $('#rnudgebackward');
   const $rnudgeforward = $('#rnudgeforward');
@@ -111,25 +111,55 @@ $(function() {
   const $confidenceellipse = $('#confidenceellipse');
   confidenceellipse = false;
 
-  let svgD;   
-
-                                                                              //the svg reference to pdfdisplay
+  let svgD;                                                                           //the svg reference to pdfdisplay
   const $display            = $('#display');
 
+  //different representation of the scatters (some for future usage)
   let scatters = [];
+  let xscatters = [];
+  let yscatters = [];
+  let scattersarray = []
 
   let xs;
   let ys;
 
   let i;
-  let displayRed;
 
-  let xmean;
-  let ymean;
-  let xsd;
-  let ysd;
+  let Mx = 0;
+  let My = 0;
+  let Sx = 0;
+  let Sy = 0;
 
-  const $calculatedr = $('#calculatedr');
+  let Sxx;
+  let Sxy;
+  let Syx;
+  let Syy;
+
+  let Cxx;
+  let Cxy;
+  let Cyx;
+  let Cyy;
+  let Cm;
+
+  //y on x
+  let betayonx = 0;
+  let alphayonx = 0;
+  let yvalueyxA = 0;
+  let yvalueyxB = 0;
+
+  //x on y
+  let betaxony = 0;
+  let alphaxony = 0;
+  let xvaluexyA = 0;
+  let xvaluexyB = 0;
+
+  //confidence line
+  let betacl = 0;
+  let alphacl = 0;
+  let yvaluecl1 = 0;
+  let yvaluecl2 = 0;
+
+  let angle = 0;
 
   const $m1 = $('#m1');
   const $m2 = $('#m2');
@@ -149,6 +179,11 @@ $(function() {
 
   function initialise() {
     
+    //TEST info panel
+    $('#displayinfopaneldiv').hide();
+    $('#confidenceellipsediv').hide();
+    confidenceellipse = false;
+
     //get initial dimensions of #display div
     margin = {top: 30, right: 50, bottom: 20, left: 50}; 
 
@@ -167,6 +202,8 @@ $(function() {
 
     createScatters();
     drawScatterGraph();
+    statistics();
+    displayStatistics();
   }
 
  
@@ -189,8 +226,11 @@ $(function() {
         sliderinuse = true;  //don't update dslider in updateN1()
         updateN1();  //create scatter and update to
         $N1val.val(N1.toFixed(0));
+
         createScatters();
         drawScatterGraph();
+        statistics();
+        displayStatistics();
       },
       onFinish: function(data) {
         updateN1();
@@ -215,8 +255,11 @@ $(function() {
         updater();
         $rval.val(rs.toFixed(2).toString().replace('0.', '.'));
         $calculatedr.text(r.toFixed(2).toString().replace('0.', '.'))
+
         createScatters();
         drawScatterGraph();
+        statistics();
+        displayStatistics();
       }
     })
     $rslider = $('#rslider').data("ionRangeSlider");
@@ -269,7 +312,11 @@ $(function() {
   function resize() {
     setDisplaySize();
     setupAxes();
+
+    //don't recreate scatters here
     drawScatterGraph();
+    statistics();
+    displayStatistics();
   }
 
   function setDisplaySize() {
@@ -350,36 +397,74 @@ $(function() {
 
   }
 
-  $('#test').on('change', function() {
-    test = $('#test').is(':checked');
-    createScatters();
-    drawScatterGraph();
-  })
 
   function createScatters() {
 
-    let xr, yr, z;
+    let iterateR = true;
+    let previousr = 0;
+    let T = 1;
+    let Tinc = 1;    
+    let diff;
 
-    //test=true;
-    if (test) {
-      scatters= [{x: -1, y: -1}, {x: -0.5, y: -0.5}, {x: -0.3, y: 0.3}, {x: 0.3, y: -0.3}, {x: 0.5, y: 0.5}, {x: 1, y: 1}]
+    scatters      = [];
+    xscatters     = [];
+    yscatters     = [];
+    scattersarray = [];
+
+    let xsa = [];
+    let ysa = [];
+
+    for (i = 0; i < N1; i += 1) {
+      xs = jStat.normal.sample( 0, 1 );
+      ys = jStat.normal.sample( 0, 1 );
+      xscatters.push(xs);
+      yscatters.push(ys);
+    }
+
+    r = jStat.corrcoeff( xscatters, yscatters );
+
+    if (rs > -1 && rs < 1 ) {
+
+      olddiff = (rs + 1) - (r + 1);
+      let min = 99;
+      let minT = 99;
+      //need to iterate to get closest r to rs
+      for (T =- 10; T < 10; T += 0.01) {
+        ysa = [];
+        //try for given value of T
+        for (i = 0; i < N1; i += 1) {
+          ysa[i] = (rs * xscatters[i] * T) + (Math.sqrt(1 - rs*rs) * yscatters[i]);
+        }
+        
+        r = jStat.corrcoeff( xscatters, ysa );  
+        diff = (rs + 1) - (r + 1);   //keep rs r positive
+
+        //lg('T = ' + T.toFixed(4) + '    Diff = ' + diff.toFixed(4));
+        if (min > Math.abs(diff)) {
+          min = Math.abs(diff);
+          minT = T;
+        }
+      }
+    
+      //lg('Minimum = ' + min.toFixed(4) + ' Minimum T = ' + minT);
+
+      scatters = []
+      for (i = 0; i < N1; i += 1) {
+        xs = xscatters[i]
+        ys = (rs * xscatters[i] * minT) + (Math.sqrt(1 - rs*rs) * yscatters[i]);
+        scatters.push( {x: xs, y: ys} );
+      }
+      yscatters = scatters.map(function (obj) { return obj.y; });
+
     }
     else {
       scatters = [];
-      s = [];
-
-      for (i = 0; i < N1; i += 1) {
-        xs = jStat.normal.sample( 0, 1 );
-        ys = jStat.normal.sample( 0, 1 );
-        ys = (rs * xs) + (Math.sqrt(1 - rs*rs) * ys);
-        scatters.push({ x: xs, y: ys });        
-        s.push([xs, ys]);
+      for (i = 0; i < N1; i += 1) { 
+        ysa = (rs * xscatters[i] * 1) + (Math.sqrt(1 - rs*rs) * yscatters[i]);
+        scatters.push( {x: xscatters[i], y: ysa} )
       }
-
-      //math.js
-      s.forEach(function (value, index, matrix) {
-        console.log('value:', value, 'index:', index) 
-      }) 
+      xscatters = scatters.map(function (obj) { return obj.x; });
+      yscatters = scatters.map(function (obj) { return obj.y; });
     }
   }
 
@@ -412,142 +497,93 @@ $(function() {
         else                         svgD.append('circle').attr('class', 'scatters').attr('cx', x(scatters[i].x)).attr('cy', y(-2.95)).attr('r', '3').attr('stroke', 'black').attr('stroke-width', 1).attr('fill', 'none');
       }
     }
-
-    statistics();
-
   }
 
   function statistics() {
 
-    let xvals = scatters.map(a => a.x);
-    let yvals = scatters.map(a => a.y);
+    Mx = jStat.mean(xscatters);
+    Sx = jStat.stdev(xscatters, true);  
 
-    xmean = jStat.mean(xvals);
-    xsd   = jStat.stdev(xvals, true);  //sample sd
+    My = jStat.mean(yscatters)
+    Sy = jStat.stdev(yscatters, true)
 
-    ymean = jStat.mean(yvals)
-    ysd   = jStat.stdev(yvals, true)
+    r = jStat.corrcoeff( xscatters, yscatters )
 
-    $m1.text(xmean.toFixed(2).toString());
-    $m2.text(ymean.toFixed(2).toString());
-    $s1.text(xsd.toFixed(2).toString());
-    $s2.text(ysd.toFixed(2).toString());
+    //get Sxy, Sxx, Syy
+    Sxx = 0;
+    Syy = 0;
+    Sxy = 0;
+    Syx = 0;
 
-    //get r
-    r = jStat.corrcoeff( xvals, yvals )
+    for (let i = 0; i < scatters.length; i += 1) {
+      Sxy += (scatters[i].x - Mx) * (scatters[i].y - My);
+      Sxx += (scatters[i].x - Mx) * (scatters[i].x - Mx);
+      Syy += (scatters[i].y - My) * (scatters[i].y - My);
+    }
+    Syx = Sxy;
+    
+    //covariance matrix Cm - [Cxx Cxy]        //if needed
+    //                       [Cyx Cyy]    
+    Cxx = jStat.covariance(xscatters, xscatters);  //this is the xsd^2, that is the variance of x
+    Cxy = jStat.covariance(xscatters, yscatters);
+    Cyx = jStat.covariance(yscatters, xscatters);  //same as Cxy really
+    Cyy = jStat.covariance(yscatters, yscatters);  //ths is the ysd^2, that is the variance of x
+
+    Cm = [[Cxx, Cxy], [Cyx, Cyy]];
+
+    //get gradients of y on x, x on y and correlation line
+    betayonx = r * Sy/Sx;
+    betaxony = r * Sx/Sy;
+    betacl    = Sy/Sx;
+    if (r < 0) betacl = -betacl;
+
+    //formula for y on x
+    alphayonx = My - betayonx * Mx;
+    yvalueyxA = alphayonx + betayonx * -3;
+    yvalueyxB = alphayonx + betayonx * 3
+
+    //formula for x on y
+    alphaxony = Mx - betaxony * My;;
+    xvaluexyA = alphaxony + betaxony * -3;
+    xvaluexyB = alphaxony + betaxony * 3
+
+    //formula for correlation line
+    yvaluecl1 = (-3 * betacl) + (My - (betacl * Mx));
+    yvaluecl2 = (3 * betacl)  + (My - (betacl * Mx));
+
+  }
+
+  function displayStatistics() {
+
+    //display mean and sd values
+    $m1.text(Mx.toFixed(2).toString());
+    $m2.text(My.toFixed(2).toString());
+    $s1.text(Sx.toFixed(2).toString());
+    $s2.text(Sy.toFixed(2).toString());
+
+    //display calculated r from data
     $calculatedr.text(r.toFixed(2).toString().replace('0.', '.'))
 
-    //display r on graph
+    //display calculated r on graph
     if(displayr) { 
       svgD.append('text').text('r = ').attr('class', 'rtext').attr('x', 150).attr('y', y(2.8)).attr('text-anchor', 'start').attr('fill', 'black').style('font-size', '2.0rem').style('font-weight', 'bold').style('font-style', 'italic');
       svgD.append('text').text(r.toFixed(2).toString().replace('0.', '.')).attr('class', 'rtext').attr('x', 200).attr('y', y(2.8)).attr('text-anchor', 'start').attr('fill', 'black').style('font-size', '2.0rem').style('font-weight', 'bold');
     }
-
-    //get Sxy, Sxx, Syy
-    let sxx = 0;
-    let syy = 0;
-    let sxy = 0;
-
-    for (let i = 0; i < scatters.length; i += 1) {
-      sxy += (scatters[i].x - xmean) * (scatters[i].y - ymean);
-      sxx += (scatters[i].x - xmean) * (scatters[i].x - xmean);
-      syy += (scatters[i].y - ymean) * (scatters[i].y - ymean);
-    }
-
-    //y on x
-    let betayonx = sxy/sxx;
-    let alphayonx = ymean - betayonx * xmean;
-    let yvalueyxA = alphayonx + betayonx * -3;
-    let yvalueyxB = alphayonx + betayonx * 3
-
-    //x on y
-    let betaxony = sxy/syy;
-    //or let betaxony = (r * r) / betayonx;  //works
-    let alphaxony = xmean - betaxony * ymean;;
-    let xvaluexyA = alphaxony + betaxony * -3;
-    let xvaluexyB = alphaxony + betaxony * 3
-
-    //get the gradient of betaxony from normal perspective
-    let betaxonygradient = (3 - -3)/(xvaluexyB - xvaluexyA);
-
 
     //need to create a clipping rectangle
     let mask = svgD.append('defs').append('clipPath').attr('id', 'mask').append('rect').attr('x', x(-3)).attr('y', y(3)).attr('width', x(3) - x(-3)).attr('height', y(-3) - y(3));
     //show clip area -- 
     //svgD.append('rect').attr('class', 'test').attr('x', x(-3)).attr('y', y(3)).attr('width', x(3) - x(-3)).attr('height', y(-3) - y(3)).attr('stroke', 'black').attr('stroke-width', '0').attr('fill', 'rgb(255, 255, 0, 0.5)');
 
+    //cross through means
     if (displayctm) {
-      svgD.append('line').attr('class', 'ctm').attr('x1', x(xmean)).attr('y1', y(-3)).attr('x2', x(xmean) ).attr('y2', y(3)).attr('stroke', 'black').attr('stroke-width', 1).style('stroke-dasharray', ('3, 3'));
-      svgD.append('line').attr('class', 'ctm').attr('x1', x(-3)).attr('y1', y(ymean)).attr('x2', x(3)).attr('y2', y(ymean)).attr('stroke', 'black').attr('stroke-width', 1).style('stroke-dasharray', ('3, 3'));
+      svgD.append('line').attr('class', 'ctm').attr('x1', x(Mx)).attr('y1', y(-3)).attr('x2', x(Mx) ).attr('y2', y(3)).attr('stroke', 'black').attr('stroke-width', 1).style('stroke-dasharray', ('3, 3'));
+      svgD.append('line').attr('class', 'ctm').attr('x1', x(-3)).attr('y1', y(My)).attr('x2', x(3)).attr('y2', y(My)).attr('stroke', 'black').attr('stroke-width', 1).style('stroke-dasharray', ('3, 3'));
     }
 
-    //TEST info panel
-    $('#displayinfopaneldiv').hide();
-    //$('#confidenceellipsediv').hide();
-    //confidenceellipse = true;
-
-    //covariance matrix - [cxx cxy]
-    //                    [cyx cyy]    
-    let covxx = jStat.covariance(xvals, xvals);  //this is the xsd^2, that is the variance of x
-    let covxy = jStat.covariance(xvals, yvals);
-    let covyx = jStat.covariance(yvals, xvals);  //same as covxy really
-    let covyy = jStat.covariance(yvals, yvals);  //ths is the ysd^2, that is the variance of x
-
-
-    
-    //create a math.matrix representation
-    //create Cholesky decomposition from covariance matrix
-    // let cov = math.matrix([[covxx, covxy], [covyx, covyy]]);
-    // print(cov); 
-    // cov = math.diag(cov);
-    // print(cov);
-    // cov = math.diag(cov);
-    // print(cov);
-    // cov = math.sqrt(cov);
-    // print(cov);
-    
-    
-    
-    // let eigs = math.eigs(cov)
-    // print(eigs);
-
-
-    $('#covxx').text(covxx.toFixed(2));
-    $('#covxy').text(covxy.toFixed(2));
-    $('#covyx').text(covyx.toFixed(2));
-    $('#covyy').text(covyy.toFixed(2));
-    
-    //find eigenvectors and eigenvalues  //depends on which is which
-    let lambda1 = quadraticB(1, -(covxx+covyy), (covxx*covyy - covxy*covyx))
-    let lambda2 = quadraticA(1, -(covxx+covyy), (covxx*covyy - covxy*covyx))
-
-    let eigenvector1 = -covxy/(covyy-lambda1);  //x=1
-    let eigenvector2 = -covxy/(covyy-lambda2);  //x=1
-
-    $('#lambda1').text(lambda1.toFixed(2));
-    $('#y1').text(eigenvector1.toFixed(2));
-
-    $('#lambda2').text(lambda2.toFixed(2));
-    $('#y2').text(eigenvector2.toFixed(2));
-
-    semimajor = xsd * Math.sqrt(4.605 * lambda1); //* widthD/6;  //90% = 4.605 ,95% = 5.991, 99% = 9.210
-    semiminor = ysd * Math.sqrt(4.605 * lambda2); // * heightD/6;
-
-    let angle; // = 90 =>horizontal!!
-    let angle1 = Math.atan(eigenvector1) * 180/Math.PI;
-    let angle2 = Math.atan(eigenvector2) * 180/Math.PI;
-
-    if (lambda1 >= lambda2) angle = angle1; else angle = angle2; 
-
-    //get gradient of eigenvector so I can draw a line  Actually this is eigenvector1
-    let gradient = eigenvector1;  //or gradient = Math.tan(angle/180 * Math.PI);
-    let ycl1 = (-3 * gradient) + (ymean - (gradient * xmean));
-    let ycl2 = (3 * gradient) + (ymean - (gradient * xmean));
-
     $corryxval.text((betayonx).toFixed(2).toString().replace('0.', '.'));
-    $corrxyval.text((betaxonygradient).toFixed(2).toString().replace('0.', '.'));
-    $corrlineslopeval.text((gradient).toFixed(2).toString().replace('0.', '.'));    
-
+    $corrxyval.text((betaxony).toFixed(2).toString().replace('0.', '.'));
+    $corrlineslopeval.text((betacl).toFixed(2).toString().replace('0.', '.')); 
 
     //corryx = true;
     if (corryx) {
@@ -557,16 +593,71 @@ $(function() {
     //corrxy = true;
     if (corrxy) {
       svgD.append('line').attr('class', 'regression').attr('x1', x(xvaluexyA)).attr('y1', y(-3)).attr('x2', x(xvaluexyB) ).attr('y2', y(3)).attr('stroke', 'red').attr('stroke-width', 1).attr('clip-path', 'url(#mask)');
-
     }
 
     //corrlineslope = true;
     if (corrlineslope) {
-      svgD.append('line').attr('class', 'regression').attr('x1', x(-3) ).attr('y1', y(ycl1) ).attr('x2', x(3) ).attr('y2', y(ycl2) ).attr('stroke', 'black').attr('stroke-width', 1).attr('clip-path', 'url(#mask)');
+      svgD.append('line').attr('class', 'regression').attr('x1', x(-3) ).attr('y1', y(yvaluecl1) ).attr('x2', x(3) ).attr('y2', y(yvaluecl2) ).attr('stroke', 'black').attr('stroke-width', 1).attr('clip-path', 'url(#mask)');
     }
+    
+    //confidenceellipse = true;
+    //drawConfidenceEllipse();
 
+  }
+
+
+  function drawConfidenceEllipse() {
     if (confidenceellipse) {
-     //https://www.visiondummy.com/2014/04/draw-error-ellipse-representing-covariance-matrix/
+
+      $('#covxx').text(Cxx.toFixed(2));
+      $('#covxy').text(Cxy.toFixed(2));
+      $('#covyx').text(Cyx.toFixed(2));
+      $('#covyy').text(Cyy.toFixed(2));    
+  
+      //get the gradient of betaxony from normal perspective
+      let betaxonygradient = (3 - -3)/(xvaluexyB - xvaluexyA);
+
+      //create a math.matrix representation
+      //create Cholesky decomposition from covariance matrix
+      // let cov = math.matrix([[covxx, covxy], [covyx, covyy]]);
+      // print(cov); 
+      // cov = math.diag(cov);
+      // print(cov);
+      // cov = math.diag(cov);
+      // print(cov);
+      // cov = math.sqrt(cov);
+      // print(cov);
+      
+      // let eigs = math.eigs(cov)
+      // print(eigs);
+
+      //find eigenvectors and eigenvalues  //depends on which is which
+      let lambda1 = quadraticB(1, -(Cxx+Cyy), (Cxx*Cyy - Cxy*Cyx))
+      let lambda2 = quadraticA(1, -(Cxx+Cyy), (Cxx*Cyy - Cxy*Cyx))
+
+      let eigenvector1 = -Cxy/(Cyy-lambda1);  //x=1
+      let eigenvector2 = -Cxy/(Cyy-lambda2);  //x=1
+
+      $('#lambda1').text(lambda1.toFixed(2));
+      $('#y1').text(eigenvector1.toFixed(2));
+
+      $('#lambda2').text(lambda2.toFixed(2));
+      $('#y2').text(eigenvector2.toFixed(2));
+
+      semimajor = Sx * Math.sqrt(4.605 * lambda1); //90% = 4.605 ,95% = 5.991, 99% = 9.210
+      semiminor = Sy * Math.sqrt(4.605 * lambda2); 
+
+      angle; // = 90 =>horizontal!!
+      let angle1 = Math.atan(eigenvector1) * 180/Math.PI;
+      let angle2 = Math.atan(eigenvector2) * 180/Math.PI;
+
+      if (lambda1 >= lambda2) angle = angle1; else angle = angle2; 
+
+      //get gradient of eigenvector so I can draw a line  Actually this is eigenvector1
+      //let gradient = eigenvector1;  //or gradient = Math.tan(angle/180 * Math.PI);
+ 
+
+      //https://www.visiondummy.com/2014/04/draw-error-ellipse-representing-covariance-matrix/
 
       //markers (for arrows)
       svgD.append("defs").append("svg:marker").attr('id', 'arrowred')
@@ -579,58 +670,72 @@ $(function() {
         .attr("orient", "auto").append("svg:path").attr("d", "M 0 0 L 10 5 L 0 10 z")
         .attr('fill', 'green');
 
+
       //covariance error ellipse
-      if (angle >= 0) svgD.append('ellipse').attr('class', 'confidenceellipse').attr( 'cx', x(xmean) ).attr('cy', y(ymean) ).attr('rx', semimajor * widthD / 6).attr('ry', semiminor * heightD / 6).attr('transform', `rotate( ${-angle}, ${x(xmean)}, ${y(ymean)} )`).attr('stroke', 'orange').attr('stroke-width', 3).attr('fill', 'none');//.attr('clip-path', 'url(#mask)');
-      else            svgD.append('ellipse').attr('class', 'confidenceellipse').attr( 'cx', x(xmean) ).attr('cy', y(ymean) ).attr('rx', semimajor * widthD / 6).attr('ry', semiminor * heightD / 6).attr('transform', `rotate( ${180-angle}, ${x(xmean)}, ${y(ymean)} )`).attr('stroke', 'orange').attr('stroke-width', 3).attr('fill', 'none')//;.attr('clip-path', 'url(#mask)');
+      if (angle >= 0) svgD.append('ellipse').attr('class', 'confidenceellipse').attr( 'cx', x(Mx) ).attr('cy', y(My) ).attr('rx', semimajor * widthD / 6).attr('ry', semiminor * heightD / 6).attr('transform', `rotate( ${-angle}, ${x(Mx)}, ${y(My)} )`).attr('stroke', 'orange').attr('stroke-width', 3).attr('fill', 'none');//.attr('clip-path', 'url(#mask)');
+      else            svgD.append('ellipse').attr('class', 'confidenceellipse').attr( 'cx', x(Mx) ).attr('cy', y(My) ).attr('rx', semimajor * widthD / 6).attr('ry', semiminor * heightD / 6).attr('transform', `rotate( ${180-angle}, ${x(Mx)}, ${y(My)} )`).attr('stroke', 'orange').attr('stroke-width', 3).attr('fill', 'none')//;.attr('clip-path', 'url(#mask)');
 
       //eigenvectors
       //major
-      if (angle >= 0) svgD.append('line').attr('class', 'regression').attr('x1', x(xmean)).attr('y1', y(ymean)).attr('x2', x(xmean) + semimajor * widthD / 6 ).attr('y2', y(ymean) ).attr('transform', `rotate( ${-angle}, ${x(xmean)}, ${y(ymean)} )`).attr('stroke', 'red').attr('stroke-width', 3).attr('marker-end', 'url(#arrowred)');//.attr('clip-path', 'url(#mask)');
-      else           svgD.append('line').attr('class', 'regression').attr('x1', x(xmean)).attr('y1', y(ymean)).attr('x2', x(xmean) + semimajor * widthD / 6 ).attr('y2', y(ymean) ).attr('transform', `rotate( ${180-angle}, ${x(xmean)}, ${y(ymean)} )`).attr('stroke', 'red').attr('stroke-width', 3).attr('marker-end', 'url(#arrowred)');//.attr('clip-path', 'url(#mask)');
+      if (angle >= 0) svgD.append('line').attr('class', 'regression').attr('x1', x(Mx)).attr('y1', y(My)).attr('x2', x(Mx) + semimajor * widthD / 6 ).attr('y2', y(My) ).attr('transform', `rotate( ${-angle}, ${x(Mx)}, ${y(My)} )`).attr('stroke', 'red').attr('stroke-width', 3).attr('marker-end', 'url(#arrowred)');//.attr('clip-path', 'url(#mask)');
+      else           svgD.append('line').attr('class', 'regression').attr('x1', x(Mx)).attr('y1', y(My)).attr('x2', x(Mx) + semimajor * widthD / 6 ).attr('y2', y(My) ).attr('transform', `rotate( ${180-angle}, ${x(Mx)}, ${y(My)} )`).attr('stroke', 'red').attr('stroke-width', 3).attr('marker-end', 'url(#arrowred)');//.attr('clip-path', 'url(#mask)');
 
       //minor
-      if (angle >= 0) svgD.append('line').attr('class', 'regression').attr('x1', x(xmean)).attr('y1', y(ymean)).attr('x2', x(xmean) ).attr('y2', y(ymean) - semiminor * heightD / 6 ).attr('transform', `rotate( ${-angle}, ${x(xmean)}, ${y(ymean)} )`).attr('stroke', 'green').attr('stroke-width', 3).attr('marker-end', 'url(#arrowgreen)');//.attr('clip-path', 'url(#mask)');
-      else           svgD.append('line').attr('class', 'regression').attr('x1', x(xmean)).attr('y1', y(ymean)).attr('x2', x(xmean) ).attr('y2', y(ymean) + semiminor * heightD / 6 ).attr('transform', `rotate( ${180-angle}, ${x(xmean)}, ${y(ymean)} )`).attr('stroke', 'green').attr('stroke-width', 3).attr('marker-end', 'url(#arrowgreen)');//.attr('clip-path', 'url(#mask)');
+      if (angle >= 0) svgD.append('line').attr('class', 'regression').attr('x1', x(Mx)).attr('y1', y(My)).attr('x2', x(Mx) ).attr('y2', y(My) - semiminor * heightD / 6 ).attr('transform', `rotate( ${-angle}, ${x(Mx)}, ${y(My)} )`).attr('stroke', 'green').attr('stroke-width', 3).attr('marker-end', 'url(#arrowgreen)');//.attr('clip-path', 'url(#mask)');
+      else           svgD.append('line').attr('class', 'regression').attr('x1', x(Mx)).attr('y1', y(My)).attr('x2', x(Mx) ).attr('y2', y(My) + semiminor * heightD / 6 ).attr('transform', `rotate( ${180-angle}, ${x(Mx)}, ${y(My)} )`).attr('stroke', 'green').attr('stroke-width', 3).attr('marker-end', 'url(#arrowgreen)');//.attr('clip-path', 'url(#mask)');
 
+    }
+
+    
+    function quadraticA(a, b, c) {
+      let xA = (-b - Math.sqrt(b * b - 4 * a * c))/(2 * a);
+      return xA;
+    }
+
+    function quadraticB(a, b, c) {
+      let xB = (-b + Math.sqrt(b * b - 4 * a * c))/(2 * a);
+      return xB;
     }
 
   }
 
-  function quadraticA(a, b, c) {
-    let xA = (-b - Math.sqrt(b * b - 4 * a * c))/(2 * a);
-    return xA;
-  }
-
-  function quadraticB(a, b, c) {
-    let xB = (-b + Math.sqrt(b * b - 4 * a * c))/(2 * a);
-    return xB;
-  }
-
-
-
   /*--------------------------------------New Data Set----------------*/ 
 
   $newdataset.on('click', function() {  //button
+
     createScatters();
     drawScatterGraph();
+    statistics();
+    displayStatistics();
   })
 
   /*--------------------------------------Display Features-------------*/
 
   $displayr.on('change', function() {
     displayr = $displayr.is(':checked');
+
+    //dont recreate scatters
     drawScatterGraph();
+    statistics();
+    displayStatistics();
   })
 
   $displayctm.on('change', function() {
     displayctm = $displayctm.is(':checked');
+
+    //don't recreate scatters
     drawScatterGraph();
-    
+    statistics();
+    displayStatistics();
   })
 
   $displaymd.on('change', function() {
     displaymd = $displaymd.is(':checked');
+
+    //don't recreate scatters
     drawScatterGraph();
+    statistics();
+    displayStatistics();
   })
 
 
@@ -662,28 +767,48 @@ $(function() {
       corrlineslope = false;
       $confidenceellipse.prop('checked', false);
       confidenceellipse = false;
+
+      //don't recreate scatters
       drawScatterGraph();
+      statistics();
+      displayStatistics();
     }
   })
 
   $corryx.on('change', function() {
     corryx = $corryx.is(':checked');
+
+    //don't recreate scatters
     drawScatterGraph();
+    statistics();
+    displayStatistics();
   })
 
   $corrxy.on('change', function() {
     corrxy = $corrxy.is(':checked');
+
+    //don't recreate scatters
     drawScatterGraph();
+    statistics();
+    displayStatistics();
   })
 
   $corrlineslope.on('change', function() {
     corrlineslope = $corrlineslope.is(':checked');
+
+    //don't recreate scatters
     drawScatterGraph();
+    statistics();
+    displayStatistics();
   })
 
   $confidenceellipse.on('change', function() {
     confidenceellipse = $confidenceellipse.is(':checked');
+
+    //don't recreate scatters
     drawScatterGraph();
+    statistics();
+    displayStatistics();
   })
 
 
@@ -705,8 +830,11 @@ $(function() {
     }
     $N1val.val(N1.toFixed(0));
     updateN1();
+
     createScatters();
     drawScatterGraph();
+    statistics();
+    displayStatistics();
   })
 
   $N1nudgebackward.on('mousedown', function() {
@@ -728,8 +856,11 @@ $(function() {
     if (N1 < 4) N1 = 4;
     $N1val.val(N1.toFixed(0));
     updateN1();
+
     createScatters();
     drawScatterGraph();
+    statistics();
+    displayStatistics();
   }
 
   $N1nudgeforward.on('mousedown', function() {
@@ -751,8 +882,11 @@ $(function() {
     if (N1 > 300) N1 = 300;
     $N1val.val(N1.toFixed(0));
     updateN1();
+
     createScatters();
     drawScatterGraph();
+    statistics();
+    displayStatistics();
   }
 
 /*----------------------------------------r nudge bars-----------*/
@@ -774,8 +908,11 @@ $(function() {
     $rval.val(rs.toFixed(2).toString().replace('0.', '.'));
     $calculatedr.text(r.toFixed(2).toString().replace('0.', '.'));
     updater();
+
     createScatters();
     drawScatterGraph();
+    statistics();
+    displayStatistics();
   })
 
   $rnudgebackward.on('mousedown', function() {
@@ -798,8 +935,11 @@ $(function() {
     $rval.val(rs.toFixed(2).toString().replace('0.', '.'));
     $calculatedr.text(r.toFixed(2).toString().replace('0.', '.'));
     updater();
+
     createScatters();
     drawScatterGraph();
+    statistics();
+    displayStatistics();
   }
 
   $rnudgeforward.on('mousedown', function() {
@@ -822,8 +962,11 @@ $(function() {
     $rval.val(rs.toFixed(2).toString().replace('0.', '.'));
     $calculatedr.text(r.toFixed(2).toString().replace('0.', '.'));
     updater();
+
     createScatters();
     drawScatterGraph();
+    statistics();
+    displayStatistics();
   }
 //#endregion
 
