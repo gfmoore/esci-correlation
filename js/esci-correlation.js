@@ -16,11 +16,13 @@ Licence       GNU General Public Licence Version 3, 29 June 2007
 0.0.6 2020-08-30 #1 All sorts of fixes and checking.
 0.0.7 2020-08-31 #1 Fix bounding on correlation line
 0.0.8 2020-09-01 #6 First attempt at forcing correlation to match target correlation
+0.0.9 2020-09-02 #5 Changed colours for labels in Display Lines  #8 added test data and import.
+
 
 */
 //#endregion 
 
-let version = '0.0.8';
+let version = '0.0.9';
 
 'use strict';
 $(function() {
@@ -108,6 +110,8 @@ $(function() {
   const $corrlineslopeval = $('#corrlineslopeval');
   let corrlineslopeval;
 
+  const $confidenceellipsediv = $('#confidenceellipsediv');
+
   const $confidenceellipse = $('#confidenceellipse');
   confidenceellipse = false;
 
@@ -166,7 +170,26 @@ $(function() {
   const $s1 = $('#s1');
   const $s2 = $('#s2');
 
+  /*-----------------load data--------------------*/
+
+  const $testdiv = $('#testdiv');
+  let testdiv = false;
+
+  const $test = $('#test');
   let test = false;
+
+  $loadtestdatapanel = $('#loadtestdatapanel');
+
+  let testdata = false;
+
+  const $loaddata = $('#loaddata ');
+  const $cleardata = $('#cleardata');
+  const $cleardatayes = $('#cleardatayes');
+  const $cleardatano = $('#cleardatano');
+
+  const $datasetdiv = $('#datasetdiv');
+
+  let loaddata = true;
 
   //#endregion
 
@@ -183,6 +206,22 @@ $(function() {
     $('#displayinfopaneldiv').hide();
     $('#confidenceellipsediv').hide();
     confidenceellipse = false;
+
+    //Test data 
+    $loadtestdatapanel.hide();
+    $cleardatayes.hide();
+    $cleardatano.hide();
+
+    $datasetdiv.hide();
+
+    $('#cleardata').hide();
+    loadTestData();
+
+    $('#group1label').val('X');
+    $('#group2label').val('Y');    
+
+    $confidenceellipsediv.show();
+
 
     //get initial dimensions of #display div
     margin = {top: 30, right: 50, bottom: 20, left: 50}; 
@@ -414,57 +453,73 @@ $(function() {
     let xsa = [];
     let ysa = [];
 
-    for (i = 0; i < N1; i += 1) {
-      xs = jStat.normal.sample( 0, 1 );
-      ys = jStat.normal.sample( 0, 1 );
-      xscatters.push(xs);
-      yscatters.push(ys);
-    }
-
-    r = jStat.corrcoeff( xscatters, yscatters );
-
-    if (rs > -1 && rs < 1 ) {
-
-      olddiff = (rs + 1) - (r + 1);
-      let min = 99;
-      let minT = 99;
-      //need to iterate to get closest r to rs
-      for (T =- 10; T < 10; T += 0.01) {
-        ysa = [];
-        //try for given value of T
-        for (i = 0; i < N1; i += 1) {
-          ysa[i] = (rs * xscatters[i] * T) + (Math.sqrt(1 - rs*rs) * yscatters[i]);
-        }
-        
-        r = jStat.corrcoeff( xscatters, ysa );  
-        diff = (rs + 1) - (r + 1);   //keep rs r positive
-
-        //lg('T = ' + T.toFixed(4) + '    Diff = ' + diff.toFixed(4));
-        if (min > Math.abs(diff)) {
-          min = Math.abs(diff);
-          minT = T;
-        }
-      }
-    
-      //lg('Minimum = ' + min.toFixed(4) + ' Minimum T = ' + minT);
-
-      scatters = []
+    if (!test) {
       for (i = 0; i < N1; i += 1) {
-        xs = xscatters[i]
-        ys = (rs * xscatters[i] * minT) + (Math.sqrt(1 - rs*rs) * yscatters[i]);
-        scatters.push( {x: xs, y: ys} );
+        xs = jStat.normal.sample( 0, 1 );
+        ys = jStat.normal.sample( 0, 1 );
+        xscatters.push(xs);
+        yscatters.push(ys);
       }
-      yscatters = scatters.map(function (obj) { return obj.y; });
+
+      r = jStat.corrcoeff( xscatters, yscatters );
+
+      if (rs > -1 && rs < 1 ) {
+
+        olddiff = (rs + 1) - (r + 1);
+        let min = 99;
+        let minT = 99;
+        //need to iterate to get closest r to rs
+        for (T =- 10; T < 10; T += 0.01) {
+          ysa = [];
+          //try for given value of T
+          for (i = 0; i < N1; i += 1) {
+            ysa[i] = (rs * xscatters[i] * T) + (Math.sqrt(1 - rs*rs) * yscatters[i]);
+          }
+          
+          r = jStat.corrcoeff( xscatters, ysa );  
+          diff = (rs + 1) - (r + 1);   //keep rs r positive
+
+          //lg('T = ' + T.toFixed(4) + '    Diff = ' + diff.toFixed(4));
+          if (min > Math.abs(diff)) {
+            min = Math.abs(diff);
+            minT = T;
+          }
+        }
+      
+        //lg('Minimum = ' + min.toFixed(4) + ' Minimum T = ' + minT);
+
+        scatters = []
+        for (i = 0; i < N1; i += 1) {
+          xs = xscatters[i]
+          ys = (rs * xscatters[i] * minT) + (Math.sqrt(1 - rs*rs) * yscatters[i]);
+          scatters.push( {x: xs, y: ys} );
+        }
+        yscatters = scatters.map(function (obj) { return obj.y; });
+
+      }
+      else {
+        scatters = [];
+        for (i = 0; i < N1; i += 1) { 
+          ysa = (rs * xscatters[i] * 1) + (Math.sqrt(1 - rs*rs) * yscatters[i]);
+          scatters.push( {x: xscatters[i], y: ysa} )
+        }
+        xscatters = scatters.map(function (obj) { return obj.x; });
+        yscatters = scatters.map(function (obj) { return obj.y; });
+      }
 
     }
-    else {
-      scatters = [];
-      for (i = 0; i < N1; i += 1) { 
-        ysa = (rs * xscatters[i] * 1) + (Math.sqrt(1 - rs*rs) * yscatters[i]);
-        scatters.push( {x: xscatters[i], y: ysa} )
+    else {  //use test data
+      //cycle trhough the displayed data and load it into scatters
+      let datadivsx = $('.dataitems1');
+      let datadivsy = $('.dataitems2');
+      
+      for (i = 0; i < datadivsx.length; i += 1) {
+        scatters.push({ x: parseFloat(datadivsx[i].value), y: parseFloat(datadivsy[i].value) })
       }
+
       xscatters = scatters.map(function (obj) { return obj.x; });
       yscatters = scatters.map(function (obj) { return obj.y; });
+
     }
   }
 
@@ -534,6 +589,7 @@ $(function() {
     //get gradients of y on x, x on y and correlation line
     betayonx = r * Sy/Sx;
     betaxony = r * Sx/Sy;
+    betaxonyinverse = 1/betaxony;
     betacl    = Sy/Sx;
     if (r < 0) betacl = -betacl;
 
@@ -582,7 +638,7 @@ $(function() {
     }
 
     $corryxval.text((betayonx).toFixed(2).toString().replace('0.', '.'));
-    $corrxyval.text((betaxony).toFixed(2).toString().replace('0.', '.'));
+    $corrxyval.text((betaxonyinverse).toFixed(2).toString().replace('0.', '.'));
     $corrlineslopeval.text((betacl).toFixed(2).toString().replace('0.', '.')); 
 
     //corryx = true;
@@ -601,7 +657,7 @@ $(function() {
     }
     
     //confidenceellipse = true;
-    //drawConfidenceEllipse();
+    drawConfidenceEllipse();
 
   }
 
@@ -1044,6 +1100,129 @@ $(function() {
       $display.removeClass('box');
       $('#boxHere').height(0);
     }
+  }
+
+
+  //----------------------------clear data buttons--------------------------------------------------
+
+  $cleardata.on('click', function() {
+    $cleardatayes.show();
+    $cleardatano.show();
+  })
+
+  $cleardatayes.on('click', function() {
+    $cleardatayes.hide();
+    $cleardatano.hide();
+    
+    //clear the data
+    $('.dataitems1').remove();
+    $('.dataitems2').remove();
+  })
+
+  $cleardatano.on('click', function() {
+    $cleardatayes.hide();
+    $cleardatano.hide();
+  })  
+
+
+  //----------------------------load data buttons--------------------------------------------------
+
+  //open test data panel
+  $test.on('change', function() {
+    test = $test.prop('checked');
+    if (test) {
+      $loadtestdatapanel.show();
+    }
+    else {
+      $loadtestdatapanel.hide();
+
+      //turn off ellipse
+      $confidenceellipse.prop('checked', false);
+      confidenceellipse = false;
+    }
+
+    createScatters();
+    drawScatterGraph();
+    statistics();
+    displayStatistics();
+  })
+
+  $loaddata.on('click', function() {
+    $('#datasetdiv').show(); 
+
+    if (loaddata) {
+      $('#datasetdiv').show();
+      loaddata = false;
+    }
+    else {
+      $('#datasetdiv').hide();
+      loaddata = true;
+    }
+  })
+
+  $('#dataset').on('change', function(e) {
+    let thefile = e.target.files; // FileList object
+    let reader = new FileReader();
+
+    let heading = true;
+    let splits;
+    let split;
+
+    $('.dataitems1').remove();
+    $('.dataitems2').remove();
+
+    reader.onload = function(event) {
+      //lg(reader.result);
+      splits = reader.result.split('\r\n');
+
+      for (let i = 0; i < splits.length-1; i += 1) {
+
+        split = splits[i].split(',');
+
+        if (heading) {
+          $('#group1labelpd').val(split[0]);
+          $('#group2labelpd').val(split[1]); 
+          heading = false;       
+        }
+        else {
+          $('#data').append(  `<input type=text class=dataitems1 value=${ split[0] }> <input type=text class=dataitems2 value=${ split[1] }>` );
+        }
+      }
+
+      createScatters();
+      drawScatterGraph();
+      statistics();
+      displayStatistics();      
+
+    }
+
+    reader.readAsText(thefile[0]);
+    $('#datasetdiv').hide();
+    loaddata = true;
+
+  })
+
+  $('.dataitems1').on('change', function() {
+    createScatters();
+    drawScatterGraph();
+    statistics();
+    displayStatistics();
+  })
+
+  $('.dataitems2').on('change', function() {
+    createScatters();
+    drawScatterGraph();
+    statistics();
+    displayStatistics();
+  })
+
+
+  function loadTestData() {
+    $('#data').append(  `<input type=text class=dataitems1 value=${ -2.9 }> <input type=text class=dataitems2 value=${ -2.6 }>` );
+    $('#data').append(  `<input type=text class=dataitems1 value=${ -1.2 }>  <input type=text class=dataitems2 value=${ -1.5 }>` );
+    $('#data').append(  `<input type=text class=dataitems1 value=${ 0.3 }>   <input type=text class=dataitems2 value=${ -0.6 }>` );
+    $('#data').append(  `<input type=text class=dataitems1 value=${ 1.4 }>   <input type=text class=dataitems2 value=${ 2.8 }>` );
+    $('#data').append(  `<input type=text class=dataitems1 value=${ 2.5 }>   <input type=text class=dataitems2 value=${ 2.2 }>` );
   }
 
 })

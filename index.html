@@ -11,6 +11,7 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
 0.0.2 2020-08-26 #2 Appearance jigs
 0.0.3 2020-08-26 #1 Basic correlation. Not all flags implemented yet.
 0.0.8
+0.0.9 2020-09-02 #5 Changed colours for labels in Display Lines  #8 added test data and import.
 -->
 <!--endregion -->
 
@@ -112,7 +113,7 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
             <div id=newdataset>New Data Set</div>
             <div>... with correlation <em>r</em></div>
 
-            <!-- <div id=testdiv>Test<input id=test type=checkbox></div> -->
+            <div id=testdiv>Test Data<input id=test type=checkbox></div>
           </div>
 
           <!------------Panel 4 Display features------------->
@@ -150,11 +151,10 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
             <div><span class=red>6</span> Display lines <input id=displaylines1show type=checkbox></div>
             
             <div id=displaylines1>
-              <div><input id=corryx type=checkbox> <em>Y</em> against <em>X</em> <span id=corryxvallabel >Slope</span>       <span id=corryxval class=red>0.0</span></div>
-              <div><input id=corrxy type=checkbox> <em>X</em> against <em>Y</em> <span id=corrxyvallabel>Slope</span>        <span id=corrxyval class=red>0.0</span></div>
-              <div><input id=corrlineslope type=checkbox> Correlation line       <span id=corrlineslopevallabel>Slope</span> <span id=corrlineslopeval class=red>0.0</span></div>
+              <div><input id=corryx type=checkbox> <span class=blue><em>Y</em> against <em>X</em></span> <span id=corryxvallabel >Slope</span>       <span id=corryxval class=red>0.0</span></div>
+              <div><input id=corrxy type=checkbox> <span class= red><em>X</em> against <em>Y</em></span> <span id=corrxyvallabel>Slope</span>        <span id=corrxyval class=red>0.0</span></div>
+              <div><input id=corrlineslope type=checkbox> <span class=black>Correlation line</span>       <span id=corrlineslopevallabel>Slope</span> <span id=corrlineslopeval class=red>0.0</span></div>
 
-              <div id=confidenceellipsediv><input id=confidenceellipse type=checkbox>90% Confidence ellipse </div>
 
             </div>
           </div> 
@@ -186,6 +186,34 @@ Licence       GNU General Public LIcence Version 3, 29 June 2007
             </div>
           </div>
 
+          <!------------Panel x Load test data Panel------------->
+          <div id=loadtestdatapanel>
+
+            <!--------Clear and load Data ----------------------------------------->                
+            <div class=cleardatapanelwrapper>
+              <div class=cleardatapanel>
+                <div id=cleardata class=clearbutton>Clear Data?</div>
+                <div id=cleardatayes class=clearbutton>Yes</div>
+                <div id=cleardatano class=clearbutton>No</div>
+                <div id=loaddata class=loadbutton>Load Data</div>
+
+              </div>
+              <div id=datasetdiv><input id=dataset class=inputfile type=file accept=".csv"></div>
+            </div>
+
+            <!-- data-->
+            <div id=middlepanel class=middlepanel>   
+              <div id=data>
+                <!-- <div class=grouplabels><em>X</em></div>
+                <div class=grouplabels><em>Y</em></div> -->
+                <input type=text id=group1label class=grouptext value=''>
+                <input type=text id=group2label class=grouptext value=''>
+              </div>
+            </div>
+            <div id=confidenceellipsediv><input id=confidenceellipse type=checkbox><!--90% Confidence ellipse--></div>
+
+
+          </div>
 
         </div> 
 
