@@ -9,20 +9,20 @@ Licence       GNU General Public Licence Version 3, 29 June 2007
 // #region Version history
 /*
 0.0.1   Initial version
-0.0.2 2020-08-26 #2 Appearance jigs
-0.0.3 2020-08-26 #1 Basic correlation. Not all flags implemented yet.
-0.0.4 2020-08-28 #1 Mostly implemented, waitimg for inevitable tweaks :)
-0.0.5 2020-08-28 #1 Fixed display of r bug
-0.0.6 2020-08-30 #1 All sorts of fixes and checking.
-0.0.7 2020-08-31 #1 Fix bounding on correlation line
-0.0.8 2020-09-01 #6 First attempt at forcing correlation to match target correlation
-0.0.9 2020-09-02 #5 Changed colours for labels in Display Lines  #8 added test data and import.
-
+0.0.2  2020-08-26 #2 Appearance jigs
+0.0.3  2020-08-26 #1 Basic correlation. Not all flags implemented yet.
+0.0.4  2020-08-28 #1 Mostly implemented, waitimg for inevitable tweaks :)
+0.0.5  2020-08-28 #1 Fixed display of r bug
+0.0.6  2020-08-30 #1 All sorts of fixes and checking.
+0.0.7  2020-08-31 #1 Fix bounding on correlation line
+0.0.8  2020-09-01 #6 First attempt at forcing correlation to match target correlation
+0.0.9  2020-09-02 #5 Changed colours for labels in Display Lines  #8 added test data and import.
+0.0.10 2020-09-03 #9 Tooltips
 
 */
 //#endregion 
 
-let version = '0.0.9';
+let version = '0.0.10';
 
 'use strict';
 $(function() {
@@ -1032,13 +1032,51 @@ $(function() {
     Tipped.setDefaultSkin('esci');
 
     //heading section
-    Tipped.create('#logo',          'Version: '+version,                              { skin: 'red', size: 'versionsize', behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    Tipped.create('#logo',          'Version: '+version,                                          { skin: 'red', size: 'versionsize', behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
   
-    Tipped.create('#tooltipsonoff', 'Tips on/off, default is off!',                   { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    Tipped.create('#tooltipsonoff', 'Tips on/off, default is off!',                               { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
 
-    Tipped.create('.headingtip',    'https://thenewstatistics.com',                   { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    Tipped.create('.headingtip',    'https://thenewstatistics.com',                               { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
 
-    Tipped.create('.hometip',       'Click to return to esci Home',                   { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    Tipped.create('.hometip',       'Click to return to esci Home',                               { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+
+    Tipped.create('#distributioncrumb', 'The appearance of data sets can vary widely, despite all having the same <em>r</em>', { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    Tipped.create('#tab1text',          'The appearance of data sets can vary widely, despite all having the same <em>r</em>', { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+  
+    //Panel 1 N
+    Tipped.create('#N1paneltip',        'Size of data set',                                       { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    Tipped.create('#N1sliderpanel',     'Select <em>N</em>, within 4 to 300',                     { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+  
+    //Panel 2 Data set correlation
+    Tipped.create('#rpaneltip',         'The correlation, <em>r</em>, of <em>X</em> and <em>Y</em> in the data set', { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    Tipped.create('#rsliderpanel',      'Select <em>r</em>',                                      { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    Tipped.create('#calculatedrdiv',    '<em>r</em> for the displayed data set',                  { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+
+    //Panel 3 New data set
+    Tipped.create('.newdatatip',        'Click for a new data set with the same <em>r</em>. Red points signal points beyond the display area', { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+  
+    //Panel 4 Display
+    Tipped.create('#displaytip',        'Choose what is displayed in the figure',                 { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    Tipped.create('.rtip',              '<em>r</em> for this data set',                           { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    Tipped.create('.ctmtip',            'Cross through mean of <em>X</em>, mean of <em>Y</em>',   { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    Tipped.create('.mdtip',             'Marginal distributions of <em>X</em> and <em>Y</em> displayed next to axes. Solid black dots at either end signal points beyond the display area.', { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+
+    //Panel 5 Statistics
+    Tipped.create('#descstatstip',      'Display mean and SD of <em>X</em> and <em>Y</em>',       { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+
+    //Panel 6 Display lines
+    Tipped.create('#displaylinestip', 'Choose lines to display',                                  { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    Tipped.create('.yxtip', 'Linear regression of <em>Y</em> against <em>X</em>',                 { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    Tipped.create('.slopeyxtip', 'Gradient of this regression line',                              { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    Tipped.create('.xytip', 'Linear regression of <em>X</em> against <em>Y</em>',                 { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    Tipped.create('.slopexytip', 'Gradient of this regression line',                              { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    Tipped.create('.cltip', 'Line for <em>r</em> = 1.0, or -1.0',                                 { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    Tipped.create('.slopecltip', 'Gradient of this line is the geometric mean of the above two gradients, with appropriate sign', { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+
+    // Tipped.create('. tip', '', { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    // Tipped.create('. tip', '', { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    // Tipped.create('. tip', '', { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
+    // Tipped.create('. tip', '', { skin: 'esci', size: 'xlarge', showDelay: 750, behavior: 'mouse', target: 'mouse', maxWidth: 250, hideOthers: true, hideOnClickOutside: true, hideAfter: 0 });
 
     
 
