@@ -18,11 +18,12 @@ Licence       GNU General Public Licence Version 3, 29 June 2007
 0.0.8  2020-09-01 #6 First attempt at forcing correlation to match target correlation
 0.0.9  2020-09-02 #5 Changed colours for labels in Display Lines  #8 added test data and import.
 0.0.10 2020-09-03 #9 Tooltips
+0.0.11 2020-09-04 #6 Refinements to closing in on target r
 
 */
 //#endregion 
 
-let version = '0.0.10';
+let version = '0.0.11';
 
 'use strict';
 $(function() {
@@ -57,7 +58,7 @@ $(function() {
   //tab 1 panel 2 r
   let $rslider;
 
-  let rs = 0.5;                                                 //r slider
+  let rt = 0.5;                                                 //r slider
   let r = 0.5;                                                  //calculated r
 
   const $rval = $('#rval');
@@ -118,14 +119,9 @@ $(function() {
   let svgD;                                                                           //the svg reference to pdfdisplay
   const $display            = $('#display');
 
-  //different representation of the scatters (some for future usage)
-  let scatters = [];
-  let xscatters = [];
-  let yscatters = [];
-  let scattersarray = []
-
-  let xs;
-  let ys;
+  let xs = [];
+  let ys = [];
+  let yt = [];
 
   let i;
 
@@ -190,6 +186,14 @@ $(function() {
   const $datasetdiv = $('#datasetdiv');
 
   let loaddata = true;
+
+  let diff;
+  let olddiff;
+  let rt2;
+  let goalseek;
+  let T;
+  let Tinc;
+  let min;
 
   //#endregion
 
@@ -289,10 +293,10 @@ $(function() {
       prettify: prettify2,
       //on slider handles change
       onChange: function (data) {
-        rs = data.from;
+        rt = data.from;
         sliderinuse = true;  //don't update dslider in updater()
         updater();
-        $rval.val(rs.toFixed(2).toString().replace('0.', '.'));
+        $rval.val(rt.toFixed(2).toString().replace('0.', '.'));
         $calculatedr.text(r.toFixed(2).toString().replace('0.', '.'))
 
         createScatters();
@@ -323,7 +327,7 @@ $(function() {
   }
 
   function updater() {
-    if (!sliderinuse) $rslider.update({ from: rs })
+    if (!sliderinuse) $rslider.update({ from: rt })
     sliderinuse = false;
   }
 
@@ -335,10 +339,10 @@ $(function() {
     updateN1();
     $N1val.text(N1.toFixed(0));
 
-    rs = 0.5;
+    rt = 0.5;
     r  = 0.5;
     updater();
-    $rval.text(rs.toFixed(2).toString().replace('0.', '.'));    
+    $rval.text(rt.toFixed(2).toString().replace('0.', '.'));    
     $calculatedr.text(r.toFixed(2).toString().replace('0.', '.')); 
 
     $statistics1.hide();
@@ -439,87 +443,98 @@ $(function() {
 
   function createScatters() {
 
-    let iterateR = true;
-    let previousr = 0;
-    let T = 1;
-    let Tinc = 1;    
-    let diff;
+    xs = [];  //x scatters array
+    ys = [];  //y scatters array
+    yt = [];  //y scatters temp array
 
-    scatters      = [];
-    xscatters     = [];
-    yscatters     = [];
-    scattersarray = [];
+    if (!test) {  //not test data
 
-    let xsa = [];
-    let ysa = [];
+      rt2 = Math.sqrt(1 - rt*rt);
 
-    if (!test) {
+      //create normal random sample for x and y scatters
       for (i = 0; i < N1; i += 1) {
-        xs = jStat.normal.sample( 0, 1 );
-        ys = jStat.normal.sample( 0, 1 );
-        xscatters.push(xs);
-        yscatters.push(ys);
+        xs.push(jStat.normal.sample( 0, 1 ));
+        ys.push(jStat.normal.sample( 0, 1 ));
       }
 
-      r = jStat.corrcoeff( xscatters, yscatters );
+      if ((rt > -1 && rt < -0.1) || (rt > 0.1 && rt < 1) ) {
+        //need to get data correlation to agree with target correlation
 
-      if (rs > -1 && rs < 1 ) {
+        T = -10; //a starting point
+        Tinc = 0.005;
+        
+        min = 1000; //some stupid high number
 
-        olddiff = (rs + 1) - (r + 1);
-        let min = 99;
-        let minT = 99;
-        //need to iterate to get closest r to rs
-        for (T =- 10; T < 20; T += 0.01) {
-          ysa = [];
-          //try for given value of T
+        goalseek = true;
+        while (goalseek) {
+          //have a go
+          yt = [];
           for (i = 0; i < N1; i += 1) {
-            ysa[i] = (rs * xscatters[i] * T) + (Math.sqrt(1 - rs*rs) * yscatters[i]);
+            yt.push( (rt * xs[i] * T) + (rt2 * ys[i]) );
           }
-          
-          r = jStat.corrcoeff( xscatters, ysa );  
-          diff = (rs + 1) - (r + 1);   //keep rs r positive
 
-          lg('T = ' + T.toFixed(4) + '    Diff = ' + diff.toFixed(4));
-          if (min > Math.abs(diff)) {
-            min = Math.abs(diff);
-            minT = T;
+          //what's it like - assume it descends to a minimum then goes back up
+          r = jStat.corrcoeff( xs, yt );
+          diff = Math.abs( (rt + 1) - (r + 1) );  //diff can vary between 0 and 2, always positive at any rate, we want diff = 0
+
+          //compare with old diff
+          if (min > diff) {
+            min = diff
+            T += Tinc;
           }
+          else {
+            //we're going back up the hill
+            T -= Tinc;
+            goalseek = false;
+          }
+          if (T > 10) goalseek = false;  //gone too far
+
         }
-      
-        lg('Minimum = ' + min.toFixed(4) + ' Minimum T = ' + minT);
-
-        scatters = []
+        //just redo with previous T
+        yt = [];
         for (i = 0; i < N1; i += 1) {
-          xs = xscatters[i]
-          ys = (rs * xscatters[i] * minT) + (Math.sqrt(1 - rs*rs) * yscatters[i]);
-          scatters.push( {x: xs, y: ys} );
+          yt.push( (rt * xs[i] * T) + (rt2 * ys[i]) );
         }
-        yscatters = scatters.map(function (obj) { return obj.y; });
-
+        ys = yt;
       }
-      else {  //r=-1 or r=1
-        scatters = [];
-        for (i = 0; i < N1; i += 1) { 
-          ysa = (rs * xscatters[i] * 1) + (Math.sqrt(1 - rs*rs) * yscatters[i]);
-          scatters.push( {x: xscatters[i], y: ysa} )
+      else if (rt >= -0.1 && rt <= 0.1) {  //i.e rt is close to 0
+        //the above goal seek doesn't work in this case as at r=0 there is no minimum with T
+        //keep grabbing sample till within 0.001
+        let cnt = 0;
+        goalseek = true;
+        while (goalseek) {
+          cnt += 1;
+          //create normal random sample for x and y scatters
+          xs = [];
+          ys = [];
+          for (i = 0; i < N1; i += 1) {
+            xs.push(jStat.normal.sample( 0, 1 ));
+            ys.push(jStat.normal.sample( 0, 1 ));
+          }
+          r = jStat.corrcoeff( xs, ys );
+          lg(cnt + ' --> ' + r);
+          if (Math.abs(r - rt) < 0.001 ) {
+            goalseek = false;
+          }
         }
-        xscatters = scatters.map(function (obj) { return obj.x; });
-        yscatters = scatters.map(function (obj) { return obj.y; });
       }
-
+      else {//r=-1 or r=1 T= 1
+        yt = []
+        for (i = 0; i < N1; i += 1) {
+          yt.push( (rt * xs[i] * 1) + (rt2 * ys[i]) );
+        }
+        ys = yt;
+      }
     }
-    else {  //use test data
+    else {  //test data
       //cycle trhough the displayed data and load it into scatters
-      let datadivsx = $('.dataitems1');
-      let datadivsy = $('.dataitems2');
-      
-      for (i = 0; i < datadivsx.length; i += 1) {
-        scatters.push({ x: parseFloat(datadivsx[i].value), y: parseFloat(datadivsy[i].value) })
+      xs = [];
+      ys = [];
+      N1 = $('.dataitems1').length;
+      for (i = 0; i < N1; i += 1) {
+        xs.push( parseFloat($('.dataitems1')[i].value) );
+        ys.push( parseFloat($('.dataitems2')[i].value) )
       }
-
-      xscatters = scatters.map(function (obj) { return obj.x; });
-      yscatters = scatters.map(function (obj) { return obj.y; });
-
     }
   }
 
@@ -532,37 +547,37 @@ $(function() {
     d3.selectAll('.confidenceellipse').remove();
 
     //display scatters
-    for (i = 0; i < scatters.length; i += 1) {
-      if      (scatters[i].x < -3)  svgD.append('circle').attr('class', 'scatters').attr('cx', x(-3.05)).attr('cy', y(scatters[i].y)).attr('r', '3').attr('stroke', 'red').attr('stroke-width', 2).attr('fill', 'red');      
-      else if (scatters[i].x > 3)   svgD.append('circle').attr('class', 'scatters').attr('cx', x(3.05)).attr('cy', y(scatters[i].y)).attr('r', '3').attr('stroke', 'red').attr('stroke-width', 2).attr('fill', 'red'); 
-      else if (scatters[i].y < -3)  svgD.append('circle').attr('class', 'scatters').attr('cx', x(scatters[i].x)).attr('cy', y(-3.05)).attr('r', '3').attr('stroke', 'red').attr('stroke-width', 2).attr('fill', 'red'); 
-      else if (scatters[i].y > 3)   svgD.append('circle').attr('class', 'scatters').attr('cx', x(scatters[i].x)).attr('cy', y(3.05)).attr('r', '3').attr('stroke', 'red').attr('stroke-width', 2).attr('fill', 'red'); 
-      else  /*normal*/              svgD.append('circle').attr('class', 'scatters').attr('cx', x(scatters[i].x)).attr('cy', y(scatters[i].y)).attr('r', '3').attr('stroke', 'blue').attr('stroke-width', 2).attr('fill', 'blue');
+    for (i = 0; i < N1; i += 1) {
+      if      (xs[i] < -3)  svgD.append('circle').attr('class', 'scatters').attr('cx', x(-3.05)).attr('cy', y(ys[i])).attr('r', '3').attr('stroke', 'red').attr('stroke-width', 2).attr('fill', 'red');      
+      else if (xs[i] > 3)   svgD.append('circle').attr('class', 'scatters').attr('cx', x(3.05)).attr('cy', y(ys[i])).attr('r', '3').attr('stroke', 'red').attr('stroke-width', 2).attr('fill', 'red'); 
+      else if (ys[i] < -3)  svgD.append('circle').attr('class', 'scatters').attr('cx', x(xs[i])).attr('cy', y(-3.05)).attr('r', '3').attr('stroke', 'red').attr('stroke-width', 2).attr('fill', 'red'); 
+      else if (ys[i] > 3)   svgD.append('circle').attr('class', 'scatters').attr('cx', x(xs[i])).attr('cy', y(3.05)).attr('r', '3').attr('stroke', 'red').attr('stroke-width', 2).attr('fill', 'red'); 
+      else  /*normal*/      svgD.append('circle').attr('class', 'scatters').attr('cx', x(xs[i])).attr('cy', y(ys[i])).attr('r', '3').attr('stroke', 'blue').attr('stroke-width', 2).attr('fill', 'blue');
     }
 
     //display marginals
     if (displaymd) {
-      for (i = 0; i < scatters.length; i += 1) {
-        if      (scatters[i].y < -3) svgD.append('circle').attr('class', 'scatters').attr('cx', x(-2.95)).attr('cy', y(-3.05)).attr('r', '3').attr('stroke', 'black').attr('stroke-width', 1).attr('fill', 'black');
-        else if (scatters[i].y > 3)  svgD.append('circle').attr('class', 'scatters').attr('cx', x(-2.95)).attr('cy', y(3.05)).attr('r', '3').attr('stroke', 'black').attr('stroke-width', 1).attr('fill', 'black');
-        else                         svgD.append('circle').attr('class', 'scatters').attr('cx', x(-2.95)).attr('cy', y(scatters[i].y)).attr('r', '3').attr('stroke', 'black').attr('stroke-width', 1).attr('fill', 'none');
+      for (i = 0; i < N1; i += 1) {
+        if      (ys[i] < -3) svgD.append('circle').attr('class', 'scatters').attr('cx', x(-2.95)).attr('cy', y(-3.05)).attr('r', '3').attr('stroke', 'black').attr('stroke-width', 1).attr('fill', 'black');
+        else if (ys[i] > 3)  svgD.append('circle').attr('class', 'scatters').attr('cx', x(-2.95)).attr('cy', y(3.05)).attr('r', '3').attr('stroke', 'black').attr('stroke-width', 1).attr('fill', 'black');
+        else                         svgD.append('circle').attr('class', 'scatters').attr('cx', x(-2.95)).attr('cy', y(ys[i])).attr('r', '3').attr('stroke', 'black').attr('stroke-width', 1).attr('fill', 'none');
  
-        if      (scatters[i].x < -3) svgD.append('circle').attr('class', 'scatters').attr('cx', x(-3.05)).attr('cy', y(-2.95)).attr('r', '3').attr('stroke', 'black').attr('stroke-width', 1).attr('fill', 'black');
-        else if (scatters[i].x > 3)  svgD.append('circle').attr('class', 'scatters').attr('cx', x(3.05)).attr('cy', y(-2.95)).attr('r', '3').attr('stroke', 'black').attr('stroke-width', 1).attr('fill', 'black');
-        else                         svgD.append('circle').attr('class', 'scatters').attr('cx', x(scatters[i].x)).attr('cy', y(-2.95)).attr('r', '3').attr('stroke', 'black').attr('stroke-width', 1).attr('fill', 'none');
+        if      (xs[i] < -3) svgD.append('circle').attr('class', 'scatters').attr('cx', x(-3.05)).attr('cy', y(-2.95)).attr('r', '3').attr('stroke', 'black').attr('stroke-width', 1).attr('fill', 'black');
+        else if (xs[i] > 3)  svgD.append('circle').attr('class', 'scatters').attr('cx', x(3.05)).attr('cy', y(-2.95)).attr('r', '3').attr('stroke', 'black').attr('stroke-width', 1).attr('fill', 'black');
+        else                         svgD.append('circle').attr('class', 'scatters').attr('cx', x(xs[i])).attr('cy', y(-2.95)).attr('r', '3').attr('stroke', 'black').attr('stroke-width', 1).attr('fill', 'none');
       }
     }
   }
 
   function statistics() {
 
-    Mx = jStat.mean(xscatters);
-    Sx = jStat.stdev(xscatters, true);  
+    Mx = jStat.mean(xs);
+    Sx = jStat.stdev(xs, true);  
 
-    My = jStat.mean(yscatters)
-    Sy = jStat.stdev(yscatters, true)
+    My = jStat.mean(ys)
+    Sy = jStat.stdev(ys, true)
 
-    r = jStat.corrcoeff( xscatters, yscatters )
+    r = jStat.corrcoeff( xs, ys )
 
     //get Sxy, Sxx, Syy
     Sxx = 0;
@@ -570,19 +585,19 @@ $(function() {
     Sxy = 0;
     Syx = 0;
 
-    for (let i = 0; i < scatters.length; i += 1) {
-      Sxy += (scatters[i].x - Mx) * (scatters[i].y - My);
-      Sxx += (scatters[i].x - Mx) * (scatters[i].x - Mx);
-      Syy += (scatters[i].y - My) * (scatters[i].y - My);
+    for (let i = 0; i < N1; i += 1) {
+      Sxy += (xs[i] - Mx) * (ys[i] - My);
+      Sxx += (xs[i] - Mx) * (xs[i] - Mx);
+      Syy += (ys[i] - My) * (ys[i] - My);
     }
     Syx = Sxy;
     
     //covariance matrix Cm - [Cxx Cxy]        //if needed
     //                       [Cyx Cyy]    
-    Cxx = jStat.covariance(xscatters, xscatters);  //this is the xsd^2, that is the variance of x
-    Cxy = jStat.covariance(xscatters, yscatters);
-    Cyx = jStat.covariance(yscatters, xscatters);  //same as Cxy really
-    Cyy = jStat.covariance(yscatters, yscatters);  //ths is the ysd^2, that is the variance of x
+    Cxx = jStat.covariance(xs, xs);  //this is the xsd^2, that is the variance of x
+    Cxy = jStat.covariance(xs, ys);
+    Cyx = jStat.covariance(ys, xs);  //same as Cxy really
+    Cyy = jStat.covariance(ys, ys);  //ths is the ysd^2, that is the variance of x
 
     Cm = [[Cxx, Cxy], [Cyx, Cyy]];
 
@@ -700,8 +715,8 @@ $(function() {
       $('#lambda2').text(lambda2.toFixed(2));
       $('#y2').text(eigenvector2.toFixed(2));
 
-      semimajor = Sx * Math.sqrt(4.605 * lambda1); //90% = 4.605 ,95% = 5.991, 99% = 9.210
-      semiminor = Sy * Math.sqrt(4.605 * lambda2); 
+      semimajor = Sx * Math.sqrt(0.2 * lambda1); //90% = 4.605 ,95% = 5.991, 99% = 9.210
+      semiminor = Sy * Math.sqrt(0.2 * lambda2); 
 
       angle; // = 90 =>horizontal!!
       let angle1 = Math.atan(eigenvector1) * 180/Math.PI;
@@ -868,7 +883,7 @@ $(function() {
   })
 
 
-/*----------------------------------------N1 nudge bars-----------*/
+/*-----------------------------------------------N1 nudge bars------------------------------*/
 //#region nudge bars
   //changes to N1
   $N1val.on('change', function() {
@@ -949,19 +964,19 @@ $(function() {
   //changes to r
   $rval.on('change', function() {
     if ( isNaN($rval.val()) ) {
-      rs = 0.5;
-      $rval.val(rs.toFixed(2).toString().replace('0.', '.'));
+      rt = 0.5;
+      $rval.val(rt.toFixed(2).toString().replace('0.', '.'));
       $calculatedr.text(r.toFixed(2).toString().replace('0.', '.'));
       return;
     };
-    rs = parseFloat($rval.val());
-    if (rs < -1) {
-      rs = -1;
+    rt = parseFloat($rval.val());
+    if (rt < -1) {
+      rt = -1;
     }
-    if (rs > 1) {
-      rs = 1;
+    if (rt > 1) {
+      rt = 1;
     }
-    $rval.val(rs.toFixed(2).toString().replace('0.', '.'));
+    $rval.val(rt.toFixed(2).toString().replace('0.', '.'));
     $calculatedr.text(r.toFixed(2).toString().replace('0.', '.'));
     updater();
 
@@ -986,9 +1001,9 @@ $(function() {
   })
 
   function rnudgebackward() {
-    rs -= 0.01;
-    if (rs < -1) rs = -1;
-    $rval.val(rs.toFixed(2).toString().replace('0.', '.'));
+    rt -= 0.01;
+    if (rt < -1) rt = -1;
+    $rval.val(rt.toFixed(2).toString().replace('0.', '.'));
     $calculatedr.text(r.toFixed(2).toString().replace('0.', '.'));
     updater();
 
@@ -1013,9 +1028,9 @@ $(function() {
   })
 
   function rnudgeforward() {
-    rs += 0.01;
-    if (rs > 1) rs = 1;
-    $rval.val(rs.toFixed(2).toString().replace('0.', '.'));
+    rt += 0.01;
+    if (rt > 1) rt = 1;
+    $rval.val(rt.toFixed(2).toString().replace('0.', '.'));
     $calculatedr.text(r.toFixed(2).toString().replace('0.', '.'));
     updater();
 
@@ -1177,6 +1192,9 @@ $(function() {
       //turn off ellipse
       $confidenceellipse.prop('checked', false);
       confidenceellipse = false;
+
+      //set N1 back to slider/textbox
+      N1 = parseInt($N1val.val());
     }
 
     createScatters();
@@ -1261,6 +1279,11 @@ $(function() {
     $('#data').append(  `<input type=text class=dataitems1 value=${ 0.3 }>   <input type=text class=dataitems2 value=${ -0.6 }>` );
     $('#data').append(  `<input type=text class=dataitems1 value=${ 1.4 }>   <input type=text class=dataitems2 value=${ 2.8 }>` );
     $('#data').append(  `<input type=text class=dataitems1 value=${ 2.5 }>   <input type=text class=dataitems2 value=${ 2.2 }>` );
+    $('#data').append(  `<input type=text class=dataitems1 value=${ -2.1 }> <input type=text class=dataitems2 value=${ -2.2 }>` );
+    $('#data').append(  `<input type=text class=dataitems1 value=${ -2.2 }>  <input type=text class=dataitems2 value=${ -1.8 }>` );
+    $('#data').append(  `<input type=text class=dataitems1 value=${ 0.5 }>   <input type=text class=dataitems2 value=${ -0.2 }>` );
+    $('#data').append(  `<input type=text class=dataitems1 value=${ 1.1 }>   <input type=text class=dataitems2 value=${ 2.3 }>` );
+    $('#data').append(  `<input type=text class=dataitems1 value=${ 2.0 }>   <input type=text class=dataitems2 value=${ 2.9 }>` );
   }
 
 })
