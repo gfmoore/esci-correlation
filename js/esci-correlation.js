@@ -469,7 +469,7 @@ $(function() {
         let min = 99;
         let minT = 99;
         //need to iterate to get closest r to rs
-        for (T =- 10; T < 10; T += 0.01) {
+        for (T =- 10; T < 20; T += 0.01) {
           ysa = [];
           //try for given value of T
           for (i = 0; i < N1; i += 1) {
@@ -479,14 +479,14 @@ $(function() {
           r = jStat.corrcoeff( xscatters, ysa );  
           diff = (rs + 1) - (r + 1);   //keep rs r positive
 
-          //lg('T = ' + T.toFixed(4) + '    Diff = ' + diff.toFixed(4));
+          lg('T = ' + T.toFixed(4) + '    Diff = ' + diff.toFixed(4));
           if (min > Math.abs(diff)) {
             min = Math.abs(diff);
             minT = T;
           }
         }
       
-        //lg('Minimum = ' + min.toFixed(4) + ' Minimum T = ' + minT);
+        lg('Minimum = ' + min.toFixed(4) + ' Minimum T = ' + minT);
 
         scatters = []
         for (i = 0; i < N1; i += 1) {
@@ -497,7 +497,7 @@ $(function() {
         yscatters = scatters.map(function (obj) { return obj.y; });
 
       }
-      else {
+      else {  //r=-1 or r=1
         scatters = [];
         for (i = 0; i < N1; i += 1) { 
           ysa = (rs * xscatters[i] * 1) + (Math.sqrt(1 - rs*rs) * yscatters[i]);
