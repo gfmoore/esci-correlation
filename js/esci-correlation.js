@@ -20,10 +20,11 @@ Licence       GNU General Public Licence Version 3, 29 June 2007
 0.0.10 2020-09-03 #9 Tooltips
 0.0.11 2020-09-04 #6 Refinements to closing in on target r
 
+0.9.0  2020-09-05 #6 Remove TEST option, set version 0.9.0
 */
 //#endregion 
 
-let version = '0.0.11';
+let version = '0.9.0';
 
 'use strict';
 $(function() {
@@ -536,6 +537,7 @@ $(function() {
         ys.push( parseFloat($('.dataitems2')[i].value) )
       }
     }
+
   }
 
   function drawScatterGraph() {
@@ -577,6 +579,7 @@ $(function() {
     My = jStat.mean(ys)
     Sy = jStat.stdev(ys, true)
 
+    //final check
     r = jStat.corrcoeff( xs, ys )
 
     //get Sxy, Sxx, Syy
