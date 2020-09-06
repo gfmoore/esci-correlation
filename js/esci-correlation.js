@@ -21,10 +21,13 @@ Licence       GNU General Public Licence Version 3, 29 June 2007
 0.0.11 2020-09-04 #6 Refinements to closing in on target r
 
 0.9.0  2020-09-05 #6 Remove TEST option, set version 0.9.0
+
+1.0.0  2020-09-06 Version 1.0.0
+
 */
 //#endregion 
 
-let version = '0.9.0';
+let version = '1.0.0';
 
 'use strict';
 $(function() {
